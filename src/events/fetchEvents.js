@@ -13,6 +13,7 @@ function registerFetchListener() {
 
     window.addEventListener(FETCH_FAILED_EVENT, () => {
         loadingBar.classList.remove('hidden');
+        loadingBar.classList.add('hidden');
     });
 }
 

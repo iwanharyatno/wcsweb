@@ -6,10 +6,13 @@ const AppConfig = {
 
 function createApiPath(path, params = {}) {
     const keys = Object.keys(params);
-    const urlParams = keys.map(k => `${k}=${encodeURIComponent(params[k])}`);
+    const urlParams = keys.map(k => {
+        const value = params[k];
+        if (typeof(value) === 'undefined') return;
+        return `${k}=${encodeURIComponent(value)}`;
+    }).filter(v => v);
 
     const result = AppConfig.API_VERSION_URL + path;
-
     if (keys.length === 0) return result;
 
     return result + '?' + urlParams.join('&');

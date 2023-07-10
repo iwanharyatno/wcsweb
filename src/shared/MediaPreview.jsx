@@ -35,6 +35,7 @@ function ImagePreview({ media, className }) {
                 <h2 className="mb-2 font-bold">{media.title}</h2>
                 <p className="text-sm">{truncate(media.description, 100)}</p>
             </article>
+            <Watermark />
         </div>
     )
 }
@@ -91,8 +92,17 @@ function VideoPreview({ media, className }) {
                 {playing ? <FaPause /> : <FaPlay />}
             </button>
             {loading && <LoadingCircle className="absolute top-4 right-4" />}
+            <Watermark />
         </div>
     )
+}
+
+function Watermark() {
+    return (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center opacity-50">
+            <img src="/banner.png" className="w-48"/>
+        </div>
+    );
 }
 
 export default MediaPreview;

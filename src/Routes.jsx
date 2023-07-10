@@ -5,6 +5,8 @@ import UploadPage from "./pages/uploadpage/UploadPage";
 import RegisterPage from "./pages/admin/registerpage/RegisterPage";
 import MediaDetailPage from "./pages/admin/mediadetailpage/MediaDetailPage";
 import { Path } from "./constants";
+import AuthProtected from "./shared/AuthProtected";
+import { Outlet } from "react-router-dom";
 
 const Routes = [
     {
@@ -17,10 +19,19 @@ const Routes = [
     },
     {
         path: Path.User.Upload,
-        element: <UploadPage />
+        element: (
+            <AuthProtected redirect={Path.Login}>
+                <UploadPage />
+            </AuthProtected>
+        )
     },
     {
         path: Path.Admin.Index,
+        element: (
+            <AuthProtected redirect={Path.Login}>
+                <Outlet />
+            </AuthProtected>
+        ),
         children: [
             {
                 path: Path.Admin.Index,

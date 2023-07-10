@@ -28,8 +28,8 @@ const Auth = {
     
             cookies.set(AppConfig.USER_COOKIE_KEY, result.data.data, options);
         } catch(e) {
-            result = e.response;
             dispatchFetchEvent(FETCH_FAILED_EVENT);
+            result = e.response.data;
         }
         dispatchFetchEvent(FETCH_END_EVENT);
 
@@ -41,8 +41,8 @@ const Auth = {
         try {
             result = getAxios().post(ApiEndpoint.Auth.CreateUser, data);
         } catch(e) {
-            result = e.response;
             dispatchFetchEvent(FETCH_FAILED_EVENT);
+            result = e.response.data;
         }
 
         return result.data;

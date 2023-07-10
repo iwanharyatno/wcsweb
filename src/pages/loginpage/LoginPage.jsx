@@ -1,18 +1,40 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FormInput } from "../../shared/FormInput";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "../../shared/Button";
 import { Path } from "../../Routes";
 import Auth from "../../api/Auth";
 import MessageBoxContext from "../../shared/MessageBoxContext";
+import { AppConfig } from "../../constants";
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
 
 function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [remember, setRemember] = useState(false);
+    const [searchParams] = useSearchParams();
 
     const msgBox = useContext(MessageBoxContext);
     const navigate = useNavigate();
+
+    const redirect = () => {
+        if (searchParams.size > 0) {
+            const redirectUrl = new URL(searchParams.get('redirect'));
+            if (redirectUrl.origin === window.location.origin) {
+                navigate(redirectUrl.pathname);
+                return;
+            }
+        }
+        navigate('/');
+    }
+
+    useEffect(() => {
+        document.title = 'WCS - Login';
+        const user = cookies.get(AppConfig.USER_COOKIE_KEY);
+        if (user) redirect();
+    }, []);
 
     const doLogin = async (e) => {
         e.preventDefault();
@@ -21,7 +43,7 @@ function LoginPage() {
             email, password
         }, remember);
 
-        if (result.meta.code >= 300) {
+        if (result && result.meta.code >= 300) {
             const errors = result.data.errors || ['Failed: ' + result.meta.code];
             errors.forEach(msg => {
                 msgBox.showMessage({
@@ -31,7 +53,7 @@ function LoginPage() {
             });
         }
 
-        navigate(Path.Index);
+        redirect();
     }
 
     return (

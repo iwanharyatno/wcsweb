@@ -11,11 +11,25 @@ const Post = {
             result = await getAxios().get(ApiEndpoint.Post.All(params));
             dispatchFetchEvent(FETCH_END_EVENT);
         } catch(e) {
-            result = e.response.data;
             dispatchFetchEvent(FETCH_FAILED_EVENT);
+            result = e.response.data;
         }
 
-        return result.data;
+        return result?.data;
+    },
+    main: async (params) => {
+        let result = null;
+
+        try {
+            dispatchFetchEvent(FETCH_START_EVENT);
+            result = await getAxios().get(ApiEndpoint.Post.Main(params));
+            dispatchFetchEvent(FETCH_END_EVENT);
+        } catch(e) {
+            dispatchFetchEvent(FETCH_FAILED_EVENT);
+            result = e.response.data;
+        }
+
+        return result?.data;
     },
     create: async (data, onProgress) => {
         const formData = new FormData();
@@ -24,7 +38,7 @@ const Post = {
         keys.forEach(k => {
             formData.append(k, data[k]);
         });
-
+        
         let result = null;
 
         try {
@@ -36,8 +50,8 @@ const Post = {
             });
             dispatchFetchEvent(FETCH_END_EVENT);
         } catch(e) {
-            result = e.response.data;
             dispatchFetchEvent(FETCH_FAILED_EVENT);
+            result = e.response.data;
         }
 
         return result.data;
