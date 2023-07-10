@@ -6,17 +6,22 @@ import LoadingCircle from "./LoadingCircle";
 function MediaPreview({ media, className }) {
 
     let element = (
-        <div className={[className, 'flex items-center justify-center w-full h-60 bg-gray-light'].join(' ')}>
+        <div className={[className, 'flex items-center justify-center w-full h-60 bg-gray-light rounded-md m-2'].join(' ')}>
             <p className="text-gray font-bold italic">Unsupported Media Type</p>
         </div>
-    )
+    );
 
-    switch(media.type) {
+    const transformedMedia = {
+        ...media,
+        type: media.type || 'image'
+    };
+
+    switch(transformedMedia.type) {
         case 'image':
-            element = <ImagePreview media={media} className={className} />
+            element = <ImagePreview media={transformedMedia} className={className} />
             break;
         case 'video':
-            element = <VideoPreview media={media} className={className} />
+            element = <VideoPreview media={transformedMedia} className={className} />
             break;
     }
     
@@ -25,7 +30,7 @@ function MediaPreview({ media, className }) {
 
 function ImagePreview({ media, className }) {
     return (
-        <div className={["rounded-md m-2 group relative bg-contain bg-no-repeat bg-center overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full bg-black flex items-center", className].join(' ')} style={{ backgroundImage: 'url("' + media.src + '")' }}>
+        <div className={["rounded-md m-2 group relative bg-contain bg-no-repeat bg-center overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full bg-black flex items-center", className].join(' ')} style={{ backgroundImage: 'url("' + media.media + '")' }}>
             <article className="absolute w-full max-h-1/2 bg-black/50 text-white top-0 left-0 p-4 -translate-y-full transition-transform group-hover:translate-y-0">
                 <h2 className="mb-2 font-bold">{media.title}</h2>
                 <p className="text-sm">{truncate(media.description, 100)}</p>
@@ -76,7 +81,7 @@ function VideoPreview({ media, className }) {
     return (
         <div className={["rounded-md m-2 group relative overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full bg-black flex items-center", className].join(' ')} style={{ backgroundImage: 'url("' + media.src + '")' }}>
             <video className="w-full h-auto" poster={media.thumbnail} ref={videoRef} onWaiting={() => setLoading(true)} onCanPlay={() => setLoading(false)}>
-                <source src={media.src} />
+                <source src={media.media} />
             </video>
             <article className="absolute w-full max-h-1/2 bg-black/50 text-white top-0 left-0 p-4 -translate-y-full transition-transform group-hover:translate-y-0">
                 <h2 className="mb-2 font-bold">{media.title}</h2>

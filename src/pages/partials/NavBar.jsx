@@ -9,10 +9,12 @@ const cookies = new Cookies();
 
 function NavBar({ onAction, action }) {
     const navigate = useNavigate();
-    const user = cookies.get(AppConfig.USER_COOKIE_KEY);
+    const user = cookies.get(AppConfig.USER_COOKIE_KEY) ? cookies.get(AppConfig.USER_COOKIE_KEY)['data'] : null;
 
     const logout = () => {
         navigate(0);
+
+        cookies.remove(AppConfig.USER_COOKIE_KEY, { path: '/' });
     }
 
     return (

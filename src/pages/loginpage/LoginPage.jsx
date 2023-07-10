@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { FormInput } from "../../shared/FormInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../shared/Button";
 import { Path } from "../../Routes";
 import Auth from "../../api/Auth";
@@ -12,11 +12,12 @@ function LoginPage() {
     const [remember, setRemember] = useState(false);
 
     const msgBox = useContext(MessageBoxContext);
+    const navigate = useNavigate();
 
-    const doLogin = (e) => {
+    const doLogin = async (e) => {
         e.preventDefault();
 
-        const result = Auth.login({
+        const result = await Auth.login({
             email, password
         }, remember);
 
@@ -30,7 +31,7 @@ function LoginPage() {
             });
         }
 
-        
+        navigate(Path.Index);
     }
 
     return (

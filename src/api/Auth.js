@@ -6,16 +6,15 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 const Auth = {
-    login: (credentials, remember) => {
+    login: async (credentials, remember) => {
         let result = null;
-
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
-            result = getAxios().post(ApiEndpoint.Auth.Login, credentials);
+            result = await getAxios().post(ApiEndpoint.Auth.Login, credentials);
 
             let options = {
                 path: '/'
-            }
+            };
     
             if (remember) {
                 const todayMillis = new Date().getTime();

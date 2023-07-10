@@ -1,6 +1,6 @@
 const AppConfig = {
-    API_BASE_URL: import.meta.env.API_BASE_URL,
-    USER_COOKIE_KEY: import.meta.env.USER_COOKIE_KEY,
+    API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+    USER_COOKIE_KEY: import.meta.env.VITE_USER_COOKIE_KEY,
     API_VERSION_URL: '/api/v1'
 }
 
@@ -36,7 +36,7 @@ const ApiEndpoint = {
     },
     Post: {
         Create: createApiPath('/posts/store'),
-        GetAll: createApiPath('/posts'),
+        All: createApiPath('/posts'),
     }
 }
 
