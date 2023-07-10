@@ -1,7 +1,6 @@
 import { Button } from "../../shared/Button";
 import NavBar from "../partials/NavBar";
 import MediaPreview from "../../shared/MediaPreview";
-import { Path } from "../../constants";
 import { useContext, useEffect, useState } from "react";
 import MessageBoxContext from "../../shared/MessageBoxContext";
 import Post from "../../api/Post";
@@ -15,6 +14,7 @@ function HomePage() {
     const msgBox = useContext(MessageBoxContext);
 
     const loadData = async () => {
+        setLoading(true);
         const result = await Post.all({ offset, limit });
 
         if (result.meta.code >= 300) {
@@ -29,6 +29,7 @@ function HomePage() {
         }
 
         setPosts([...posts, ...result.data]);
+        setLoading(false);
     }
 
     useEffect(() => {
