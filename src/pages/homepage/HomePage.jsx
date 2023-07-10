@@ -1,4 +1,4 @@
-import { LinkButton } from "../../shared/Button";
+import { Button } from "../../shared/Button";
 import NavBar from "../partials/NavBar";
 import MediaPreview from "../../shared/MediaPreview";
 import { Path } from "../../constants";
@@ -8,28 +8,32 @@ import Post from "../../api/Post";
 
 function HomePage() {
     const [posts, setPosts] = useState([]);
+    const [offset, setOffset] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const limit = 10;
 
     const msgBox = useContext(MessageBoxContext);
 
-    useEffect(() => {
-        const loadData = async () => {
-            const result = await Post.all();
-    
-            if (result.meta.code >= 300) {
-                const errors = result.data.errors || ['Failed: ' + result.meta.code];
-                errors.forEach(msg => {
-                    msgBox.showMessage({
-                        type: 'error',
-                        message: msg
-                    });
-                });
-                return;
-            }
+    const loadData = async () => {
+        const result = await Post.all({ offset, limit });
 
-            setPosts(result.data);
+        if (result.meta.code >= 300) {
+            const errors = result.data.errors || ['Failed: ' + result.meta.code];
+            errors.forEach(msg => {
+                msgBox.showMessage({
+                    type: 'error',
+                    message: msg
+                });
+            });
+            return;
         }
+
+        setPosts([...posts, ...result.data]);
+    }
+
+    useEffect(() => {
         loadData();
-    }, [msgBox]);
+    }, [offset]);
 
     return (
         <>
@@ -40,7 +44,7 @@ function HomePage() {
                     {posts && posts.map(p => <MediaPreview className="h-72" media={p} key={p.id} />)}
                 </div>
                 <div className="text-center mt-4 mb-8">
-                    <LinkButton to={Path.MediaList.Index} variant="pill" className="inline-block min-w-[16rem]">See More</LinkButton>
+                    <Button disabled={loading} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
                 </div>
             </main>
         </>

@@ -3,14 +3,40 @@ import { dispatchFetchEvent } from "../events/fetchEvents";
 import getAxios from "../network/getAxios";
 
 const Post = {
-    all: async () => {
+    all: async (params) => {
         let result = null;
 
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
-            result = await getAxios().get(ApiEndpoint.Post.All);
+            result = await getAxios().get(ApiEndpoint.Post.All(params));
             dispatchFetchEvent(FETCH_END_EVENT);
         } catch(e) {
+            result = e.response.data;
+            dispatchFetchEvent(FETCH_FAILED_EVENT);
+        }
+
+        return result.data;
+    },
+    create: async (data, onProgress) => {
+        const formData = new FormData();
+        const keys = Object.keys(data);
+
+        keys.forEach(k => {
+            formData.append(k, data[k]);
+        });
+
+        let result = null;
+
+        try {
+            dispatchFetchEvent(FETCH_START_EVENT);
+            result = await getAxios().post(ApiEndpoint.Post.Create, formData, {
+                onUploadProgress: (e) => {
+                    if (onProgress) onProgress(e);
+                }
+            });
+            dispatchFetchEvent(FETCH_END_EVENT);
+        } catch(e) {
+            result = e.response.data;
             dispatchFetchEvent(FETCH_FAILED_EVENT);
         }
 

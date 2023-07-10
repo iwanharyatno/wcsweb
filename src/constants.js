@@ -4,8 +4,15 @@ const AppConfig = {
     API_VERSION_URL: '/api/v1'
 }
 
-function createApiPath(path) {
-    return AppConfig.API_VERSION_URL + path;
+function createApiPath(path, params = {}) {
+    const keys = Object.keys(params);
+    const urlParams = keys.map(k => `${k}=${encodeURIComponent(params[k])}`);
+
+    const result = AppConfig.API_VERSION_URL + path;
+
+    if (keys.length === 0) return result;
+
+    return result + '?' + urlParams.join('&');
 }
 
 const Path = {
@@ -36,7 +43,8 @@ const ApiEndpoint = {
     },
     Post: {
         Create: createApiPath('/posts/store'),
-        All: createApiPath('/posts'),
+        All: (params) => createApiPath('/posts', params),
+        Main: (params) => createApiPath('/posts/main', params),
     }
 }
 
