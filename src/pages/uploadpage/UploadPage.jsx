@@ -24,6 +24,15 @@ function UploadPage() {
     
     const submitData = async (e) => {
         e.preventDefault();
+
+        if (!data.media) {
+            msgBox.showMessage({
+                type: 'error',
+                message: 'Please select a file'
+            });
+            return;
+        }
+
         setLoading(true);
 
         const result = await Post.create(data, (e) => {
@@ -102,7 +111,7 @@ function UploadPage() {
                             <span>Drag & Drop file or browse your computer</span>
                         </label>
                         {data.media && renderPreview(data.media)}
-                        <input type="file" accept="image/*, video/*, audio/*" id="media" className="hidden" onChange={(e) => setData({...data, media: e.target.files[0]})} required />
+                        <input type="file" accept="image/*, video/*, audio/*" id="media" className="hidden" onChange={(e) => setData({...data, media: e.target.files[0]})} />
                     </div>
                     {loading && <div className={'mb-4 lg:block lg:col-span-2 ' + (step === 2 ? 'block' : 'hidden')}>
                         <div className="relative py-2 px-4 rounded-md bg-gray-light">

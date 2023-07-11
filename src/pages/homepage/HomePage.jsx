@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import MessageBoxContext from "../../shared/MessageBoxContext";
 import Post from "../../api/Post";
 import { FormInput } from "../../shared/FormInput";
+import { FaSearch } from "react-icons/fa";
 
 function HomePage() {
     const [posts, setPosts] = useState([]);
@@ -19,7 +20,7 @@ function HomePage() {
 
     const loadData = async () => {
         setLoading(true);
-        const result = await Post.all({ offset, limit, type: (mediaType === 'home' ? undefined : mediaType), keyword: (searchQuery && searching ? searchQuery : undefined)});
+        const result = await Post.main({ offset, limit, type: (mediaType === 'home' ? undefined : mediaType), keyword: (searchQuery && searching ? searchQuery : undefined)});
 
         if (result && result.meta.code >= 300) {
             const errors = result.data.errors || ['Failed: ' + result.meta.code];
@@ -52,6 +53,7 @@ function HomePage() {
     const searchMedia = (e) => {
         e.preventDefault();
         setSearching(true);
+        if (searching) loadData();
     };
 
     const clearSearch = () => {
@@ -69,6 +71,7 @@ function HomePage() {
                         <form onSubmit={searchMedia} className="flex justify-end gap-2">
                             {searching && <Button type="button" onClick={clearSearch} className="bg-red-medium hover:bg-red-medium/75">Cancel</Button>}
                             <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
+                            <Button type="submit"><FaSearch /></Button>
                         </form>
                     </div>
                     {posts && posts.map(p => <MediaPreview className="h-72" media={p} key={p.id} />)}

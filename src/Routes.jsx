@@ -3,7 +3,7 @@ import HomePageAdmin from "./pages/admin/homepage/HomePage";
 import LoginPage from "./pages/loginpage/LoginPage";
 import UploadPage from "./pages/uploadpage/UploadPage";
 import RegisterPage from "./pages/admin/registerpage/RegisterPage";
-import MediaDetailPage from "./pages/admin/mediadetailpage/MediaDetailPage";
+import MediaDetailPage from "./pages/admin/mediadetailpage/PostDetailPage";
 import { Path } from "./constants";
 import AuthProtected from "./shared/AuthProtected";
 import { Outlet } from "react-router-dom";

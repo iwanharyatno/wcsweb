@@ -55,6 +55,34 @@ const Post = {
         }
 
         return result.data;
+    },
+    single: async (id) => {
+        let result = null;
+
+        try {
+            dispatchFetchEvent(FETCH_START_EVENT);
+            result = await getAxios().get(ApiEndpoint.Post.Single(id));
+            dispatchFetchEvent(FETCH_END_EVENT);
+        } catch(e) {
+            dispatchFetchEvent(FETCH_FAILED_EVENT);
+            result = e.response?.data;
+        }
+
+        return result?.data;
+    },
+    banners: async () => {
+        let result = null;
+
+        try {
+            dispatchFetchEvent(FETCH_START_EVENT);
+            result = await getAxios().get(ApiEndpoint.Banner.All);
+            dispatchFetchEvent(FETCH_END_EVENT);
+        } catch(e) {
+            dispatchFetchEvent(FETCH_FAILED_EVENT);
+            result = e.response.data;
+        }
+
+        return result?.data;
     }
 }
 

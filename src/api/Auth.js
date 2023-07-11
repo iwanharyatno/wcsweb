@@ -35,15 +35,17 @@ const Auth = {
 
         return result.data;
     },
-    register: (data) => {
+    register: async (data) => {
         let result = null;
 
         try {
-            result = getAxios().post(ApiEndpoint.Auth.CreateUser, data);
+            dispatchFetchEvent(FETCH_START_EVENT);
+            result = await getAxios().post(ApiEndpoint.Auth.CreateUser, data);
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);
             result = e.response.data;
         }
+        dispatchFetchEvent(FETCH_END_EVENT);
 
         return result.data;
     }

@@ -1,83 +1,138 @@
-import { useEffect, useRef, useState } from "react";
-import { FaArrowAltCircleLeft, FaArrowAltCircleRight, FaCalendarAlt, FaMapMarkerAlt, FaPause, FaPlay } from "react-icons/fa";
-import { LinkButton } from "../../../shared/Button";
+import { useContext, useEffect, useRef, useState } from "react";
+import { FaArrowLeft, FaArrowRight, FaCalendarAlt, FaMapMarkerAlt, FaPause, FaPlay, FaSearch } from "react-icons/fa";
+import { Button, LinkButton } from "../../../shared/Button";
 import { truncate } from "../../../shared/utils";
 import LoadingCircle from "../../../shared/LoadingCircle";
 import { FormInput } from "../../../shared/FormInput";
 import { Link, useNavigate } from "react-router-dom";
 import NavBar from "../../partials/NavBar";
 import { Path } from "../../../Routes";
+import MessageBoxContext from "../../../shared/MessageBoxContext";
+import Post from "../../../api/Post";
 
 function HomePage() {
-    const [medias, setMedias] = useState(null);
+    const [posts, setPosts] = useState(null);
+    const [offset, setOffset] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [mediaType, setMediaType] = useState(undefined);
     const [searchQuery, setSearchQuery] = useState('');
-    const otherMedias = medias ? medias.slice(1) : [];
+    const [searching, setSearching] = useState(false);
+    const limit = 10;
+
+    const msgBox = useContext(MessageBoxContext);
     const navigate = useNavigate();
 
+    const loadData = async () => {
+        setLoading(true);
+        const result = await Post.all({ offset, limit, type: (mediaType === 'home' ? undefined : mediaType), keyword: (searchQuery && searching ? searchQuery : undefined)});
+
+        if (result && result.meta.code >= 300) {
+            const errors = result.data.errors || ['Failed: ' + result.meta.code];
+            errors.forEach(msg => {
+                msgBox.showMessage({
+                    type: 'error',
+                    message: msg
+                });
+            });
+            return;
+        }
+
+        if (result) {
+            if (offset !== 0) setPosts([...posts, ...result.data]);
+            else setPosts(result.data);
+        }
+        
+        setLoading(false);
+    }
+
+    const loadWithFilter = (mediaType) => {
+        setMediaType(mediaType);
+        setOffset(0);
+    }
+
     useEffect(() => {
-        setMedias([
-            ...getSrc(5).map(src => ({
-                id: +new Date() + Math.random(),
-                date: new Date(),
-                location: 'Picsum',
-                src: src,
-                title: 'Lorem ipsum dolor sit amet',
-                description: 'Lorem ipsum dolor sit amet, consetetur adispicing elit aliquam nulla. Lorem ipsum dolor sit amet, consetetur adispicing elit aliquam nulla. Lorem ipsum dolor sit amet, consetetur adispicing elit aliquam nulla.',
-                type: 'image'
-            })),
-            {
-                id: +new Date() + Math.random(),
-                date: new Date(),
-                location: 'Google',
-                src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                thumbnail: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg',
-                title: 'Elephant Dream',
-                description: 'The first Blender Open Movie from 2006',
-                type: 'video'
-            },
-            {
-                id: +new Date() + Math.random(),
-                date: new Date(),
-                location: 'Google',
-                src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                thumbnail: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg',
-                title: 'Big Buck Bunny',
-                description: 'Big Buck Bunny tells the story of a giant rabbit with a heart bigger than himself. When one sunny day three rodents rudely harass him, something snaps... and the rabbit ain\'t no bunny anymore! In the typical cartoon tradition he prepares the nasty rodents a comical revenge.\n\nLicensed under the Creative Commons Attribution license\nhttp://www.bigbuckbunny.org',
-                type: 'video'
-            }
-        ])
-    }, []);
+        loadData();
+    }, [offset, mediaType, searching]);
 
     const searchMedia = (e) => {
         e.preventDefault();
+        setSearching(true);
+        if (searching) loadData();
+    };
+
+    const clearSearch = () => {
+        setSearchQuery('');
+        setSearching(false);
     }
 
     return (
         <div>
-            <NavBar action="Register User" onAction={() => navigate('/admin/registeruser')} />
-            {medias && <>
-                {medias.length > 0 && <MediaHero media={medias[0]} />}
+            <NavBar selected={mediaType} onNavigate={(m) => loadWithFilter(m.value)} action="Register User" onAction={() => navigate('/admin/registeruser')} />
+            {posts && <>
+                {posts.length > 0 && <MediaHero media={posts[0]} />}
                 <div className="grid md:grid-cols-2 max-w-6xl mx-auto p-8 gap-8">
                     <div className="md:col-span-2">
-                        <form onSubmit={searchMedia} className="flex justify-end">
-                            <FormInput value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
+                        <form onSubmit={searchMedia} className="flex justify-end gap-2">
+                            {searching && <Button type="button" onClick={clearSearch} className="bg-red-medium hover:bg-red-medium/75">Cancel</Button>}
+                            <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
+                            <Button type="submit"><FaSearch /></Button>
                         </form>
                     </div>
-                    {otherMedias.map(e => <MediaItem media={e} key={e.id} />)}
+                    {posts.map(e => <MediaItem media={e} key={e.id} />)}
                 </div>
             </>}
+            <div className="text-center mt-4 mb-8">
+                <Button disabled={loading} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
+            </div>
         </div>
     );
 }
 
-function MediaHero({ media }) {
+function MediaHero() {
+    const [banners, setBanners] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const msgBox = useContext(MessageBoxContext);
+
+    useEffect(() => {
+        const loadData = async () => {
+            const result = await Post.banners();
+            
+            if (result && result.meta.code >= 300) {
+                const errors = result.data.errors || ['Failed: ' + result.meta.code];
+                errors.forEach(msg => {
+                    msgBox.showMessage({
+                        type: 'error',
+                        message: msg
+                    });
+                });
+                return;
+            }
+
+            if (result) setBanners(result.data)
+        };
+        loadData();
+    }, []);
+
+    const currentBanner = banners[currentIndex] || {};
+
+    const previousBanner = () => {
+        if (currentIndex === 0) return;
+        setCurrentIndex(currentIndex - 1);
+    }
+
+    const nextBanner = () => {
+        if (currentIndex === banners.length - 1) return;
+        setCurrentIndex(currentIndex + 1);
+    }
+
     return (
-        <div className={'bg-contain relative min-h-screen md:min-h-[40vh] text-white flex justify-between px-8 z-10 items-center gap-2 overflow-hidden'} style={{ backgroundImage: "url('" + media.src + "')"}}>
-            <button className="opacity-50 hover:opacity-100 text-white text-5xl">
-                <FaArrowAltCircleLeft />
+        <div className={'bg-contain relative min-h-screen md:min-h-[40vh] text-white flex justify-between px-8 z-10 items-center gap-2 overflow-hidden'} style={{ backgroundImage: "url('" + currentBanner.media + "')"}}>
+            <button className="opacity-50 hover:opacity-100 bg-gray-light text-white text-3xl p-3 rounded-full" onClick={() => previousBanner()}>
+                <FaArrowLeft />
             </button>
-            <button className="opacity-50 hover:opacity-100 text-white text-5xl">
-                <FaArrowAltCircleRight />
+            <button className="opacity-50 hover:opacity-100 bg-gray-light text-white text-3xl p-3 rounded-full" onClick={() => nextBanner()}>
+                <FaArrowRight />
             </button>
         </div>
     );
@@ -106,13 +161,13 @@ function MediaItem({ media }) {
     }
 
     const renderElement = () => {
-        let element = <div className="bg-contain bg-no-repeat bg-center w-full h-full" style={{ backgroundImage: "url('" + media.src +"')" }}></div>
+        let element = <div className="bg-contain bg-no-repeat bg-center w-full h-full" style={{ backgroundImage: "url('" + media.media +"')" }}></div>
         
         if (media.type === 'video') {
             element = (
                 <div className="group relative overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full">
                     <video className="w-full h-auto" poster={media.thumbnail} ref={videoRef} onWaiting={() => setLoading(true)} onCanPlay={() => setLoading(false)}>
-                        <source src={media.src} />
+                        <source src={media.media} />
                     </video>
                     <button className={controlClasses()} onClick={handleControlClick}>
                         {playing ? <FaPause /> : <FaPlay />}
@@ -143,7 +198,7 @@ function MediaItem({ media }) {
     }
 
     return (
-        <article className="flex flex-col md:flex-row mx-auto overflow-hidden rounded-2xl shadow-xl">
+        <article className="flex flex-col md:flex-row overflow-hidden rounded-2xl shadow-xl">
             <div className="w-full min-h-[12rem] md:w-1/2 bg-black flex items-center">
                 {renderElement()}
             </div>
@@ -162,20 +217,6 @@ function MediaItem({ media }) {
             </div>
         </article>
     )
-}
-
-function getSrc(count) {
-    const srcs = [];
-
-    for(let i = 0; i < count; i++) {
-        srcs.push(`https://picsum.photos/${getRandomSize(600, 1000)}/${getRandomSize(600, 1000)}`)
-    }
-
-    return srcs;
-}
-
-function getRandomSize(min, max) {
-    return Math.round(Math.random() * (max - min) + min);
 }
 
 export default HomePage;
