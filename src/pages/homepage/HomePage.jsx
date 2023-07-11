@@ -34,6 +34,7 @@ function HomePage() {
     }
 
     const loadWithFilter = (mediaType) => {
+        setPosts([]);
         setMediaType(mediaType);
         setOffset(0);
     }
