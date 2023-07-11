@@ -7,6 +7,7 @@ import MediaDetailPage from "./pages/admin/mediadetailpage/PostDetailPage";
 import { Path } from "./constants";
 import AuthProtected from "./shared/AuthProtected";
 import { Outlet } from "react-router-dom";
+import ForgotPassword from "./pages/forgotpassword/ForgotPassword";
 
 const Routes = [
     {
@@ -24,6 +25,10 @@ const Routes = [
                 <UploadPage />
             </AuthProtected>
         )
+    },
+    {
+        path: Path.ForgotPassword,
+        element: <ForgotPassword />
     },
     {
         path: Path.Admin.Index,

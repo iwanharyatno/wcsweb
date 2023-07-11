@@ -6,6 +6,7 @@ import MessageBoxContext from "../../shared/MessageBoxContext";
 import Post from "../../api/Post";
 import { FormInput } from "../../shared/FormInput";
 import { FaSearch } from "react-icons/fa";
+import { handleErrors } from "../../shared/utils";
 
 function HomePage() {
     const [posts, setPosts] = useState([]);
@@ -22,16 +23,7 @@ function HomePage() {
         setLoading(true);
         const result = await Post.main({ offset, limit, type: (mediaType === 'home' ? undefined : mediaType), keyword: (searchQuery && searching ? searchQuery : undefined)});
 
-        if (result && result.meta.code >= 300) {
-            const errors = result.data.errors || ['Failed: ' + result.meta.code];
-            errors.forEach(msg => {
-                msgBox.showMessage({
-                    type: 'error',
-                    message: msg
-                });
-            });
-            return;
-        }
+        if (handleErrors(msgBox, result)) return;
 
         if (result) {
             if (offset !== 0) setPosts([...posts, ...result.data]);

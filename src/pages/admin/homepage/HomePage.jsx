@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { FaArrowLeft, FaArrowRight, FaCalendarAlt, FaMapMarkerAlt, FaPause, FaPlay, FaSearch } from "react-icons/fa";
 import { Button, LinkButton } from "../../../shared/Button";
-import { truncate } from "../../../shared/utils";
+import { handleErrors, truncate } from "../../../shared/utils";
 import LoadingCircle from "../../../shared/LoadingCircle";
 import { FormInput } from "../../../shared/FormInput";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,16 +26,7 @@ function HomePage() {
         setLoading(true);
         const result = await Post.all({ offset, limit, type: (mediaType === 'home' ? undefined : mediaType), keyword: (searchQuery && searching ? searchQuery : undefined)});
 
-        if (result && result.meta.code >= 300) {
-            const errors = result.data.errors || ['Failed: ' + result.meta.code];
-            errors.forEach(msg => {
-                msgBox.showMessage({
-                    type: 'error',
-                    message: msg
-                });
-            });
-            return;
-        }
+        if (handleErrors(msgBox, result)) return;
 
         if (result) {
             if (offset !== 0) setPosts([...posts, ...result.data]);
@@ -98,16 +89,7 @@ function MediaHero() {
         const loadData = async () => {
             const result = await Post.banners();
             
-            if (result && result.meta.code >= 300) {
-                const errors = result.data.errors || ['Failed: ' + result.meta.code];
-                errors.forEach(msg => {
-                    msgBox.showMessage({
-                        type: 'error',
-                        message: msg
-                    });
-                });
-                return;
-            }
+            if (handleErrors(msgBox, result)) return;
 
             if (result) setBanners(result.data)
         };

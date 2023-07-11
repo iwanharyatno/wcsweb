@@ -11,6 +11,7 @@ const Auth = {
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
             result = await getAxios().post(ApiEndpoint.Auth.Login, credentials);
+            result = result.data;
 
             let options = {
                 path: '/'
@@ -26,14 +27,14 @@ const Auth = {
                 };
             }
     
-            cookies.set(AppConfig.USER_COOKIE_KEY, result.data.data, options);
+            cookies.set(AppConfig.USER_COOKIE_KEY, result.data, options);
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);
-            result = e.response.data;
+            result = e.response;
         }
         dispatchFetchEvent(FETCH_END_EVENT);
 
-        return result.data;
+        return result;
     },
     register: async (data) => {
         let result = null;
@@ -41,13 +42,29 @@ const Auth = {
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
             result = await getAxios().post(ApiEndpoint.Auth.CreateUser, data);
+            result = result.data;
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);
-            result = e.response.data;
+            result = e.response;
         }
         dispatchFetchEvent(FETCH_END_EVENT);
 
-        return result.data;
+        return result;
+    },
+    forgotpassword: async (data) => {
+        let result = null;
+
+        try {
+            dispatchFetchEvent(FETCH_START_EVENT);
+            result = await getAxios().post(ApiEndpoint.Auth.ForgotPassword, data);
+            result = result.data;
+        } catch(e) {
+            dispatchFetchEvent(FETCH_FAILED_EVENT);
+            result = e.response;
+        }
+        dispatchFetchEvent(FETCH_END_EVENT);
+
+        return result;
     }
 }
 

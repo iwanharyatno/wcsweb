@@ -7,6 +7,7 @@ import Post from "../../api/Post";
 import MessageBoxContext from "../../shared/MessageBoxContext";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../../constants";
+import { handleErrors } from "../../shared/utils";
 
 function UploadPage() {
     const [data, setData] = useState({});
@@ -38,16 +39,7 @@ function UploadPage() {
         const result = await Post.create(data, (e) => {
             setUploadProgress(e.progress * 100);
         });
-
-        if (result.meta.code >= 300) {
-            const errors = result.data.errors || ['Failed: ' + result.meta.code];
-            errors.forEach(msg => {
-                msgBox.showMessage({
-                    type: 'error',
-                    message: msg
-                });
-            });
-        }
+        if (handleErrors(msgBox, result)) return;
 
         setLoading(false);
         msgBox.showMessage({

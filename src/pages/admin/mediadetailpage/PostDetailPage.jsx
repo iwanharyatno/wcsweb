@@ -5,6 +5,7 @@ import { Path } from "../../../Routes";
 import { FaCalendarAlt, FaCamera, FaClock, FaMapMarkerAlt, FaStar, FaTasks } from "react-icons/fa";
 import Post from "../../../api/Post";
 import MessageBoxContext from "../../../shared/MessageBoxContext";
+import { handleErrors } from "../../../shared/utils";
 
 function PostDetailPage() {
     const [post, setPost] = useState(null);
@@ -18,17 +19,7 @@ function PostDetailPage() {
         const loadData = async () => {
             setLoading(true);
             const result = await Post.single(params['id']);
-
-            if (result && result.meta.code >= 300) {
-                const errors = result.data.errors || ['Failed: ' + result.meta.code];
-                errors.forEach(msg => {
-                    msgBox.showMessage({
-                        type: 'error',
-                        message: msg
-                    });
-                });
-                return;
-            }
+            if (handleErrors(msgBox, result)) return;
 
             if (result) setPost(result.data)
             

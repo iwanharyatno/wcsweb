@@ -7,6 +7,7 @@ import Auth from "../../api/Auth";
 import MessageBoxContext from "../../shared/MessageBoxContext";
 import { AppConfig } from "../../constants";
 import Cookies from 'universal-cookie';
+import { handleErrors } from "../../shared/utils";
 
 const cookies = new Cookies();
 
@@ -43,15 +44,7 @@ function LoginPage() {
             email, password
         }, remember);
 
-        if (result && result.meta.code >= 300) {
-            const errors = result.data.errors || ['Failed: ' + result.meta.code];
-            errors.forEach(msg => {
-                msgBox.showMessage({
-                    type: 'error',
-                    message: msg
-                });
-            });
-        }
+        if (handleErrors(msgBox, result)) return;
 
         redirect();
     }
@@ -68,7 +61,7 @@ function LoginPage() {
                 <div className="flex mb-8 w-full">
                     <input type="checkbox" id="rememberCheckbox" onChange={() => setRemember(!remember)} />
                     <label htmlFor="rememberCheckbox" className="ml-2 grow">Remember Me</label>
-                    <Link to={Path.ForgotPassword} className="text-blue-light hover:text-blue hidden">Forgot password?</Link>
+                    <Link to={Path.ForgotPassword} className="text-blue-light hover:text-blue">Forgot password?</Link>
                 </div>
                 <Button type="submit" className="block w-full" variant="pill">Login</Button>
             </form>

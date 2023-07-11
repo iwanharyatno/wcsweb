@@ -6,6 +6,7 @@ import Auth from "../../../api/Auth";
 import MessageBoxContext from "../../../shared/MessageBoxContext";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../../../constants";
+import { handleErrors } from "../../../shared/utils";
 
 function RegisterPage() {
     const [firstName, setFirstName] = useState('');
@@ -24,16 +25,7 @@ function RegisterPage() {
         const result = await Auth.register(data);
         setLoading(false);
 
-        if (result && result.meta && result.meta.code >= 400) {
-            const errors = result.data.errors || ['Failed: ' + result.meta.code];
-            errors.forEach(msg => {
-                msgBox.showMessage({
-                    type: 'error',
-                    message: msg
-                });
-            });
-            return;
-        }
+        if (handleErrors(msgBox, result)) return;
 
         msgBox.showMessage({
             type: 'success',

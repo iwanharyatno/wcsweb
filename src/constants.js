@@ -41,7 +41,7 @@ const Path = {
 const ApiEndpoint = {
     Auth: {
         Login: createApiPath('/auth/login'),
-        ForgetPassword: createApiPath('/auth/forget_password'),
+        ForgotPassword: createApiPath('/auth/forget_password'),
         CreateUser: createApiPath('/auth/register')
     },
     Post: {

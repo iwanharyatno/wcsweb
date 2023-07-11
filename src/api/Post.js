@@ -9,13 +9,14 @@ const Post = {
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
             result = await getAxios().get(ApiEndpoint.Post.All(params));
+            result = result.data;
             dispatchFetchEvent(FETCH_END_EVENT);
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);
-            result = e.response.data;
+            result = e.response;
         }
 
-        return result?.data;
+        return result;
     },
     main: async (params) => {
         let result = null;
@@ -23,13 +24,14 @@ const Post = {
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
             result = await getAxios().get(ApiEndpoint.Post.Main(params));
+            result = result.data;
             dispatchFetchEvent(FETCH_END_EVENT);
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);
-            result = e.response.data;
+            result = e.response;
         }
 
-        return result?.data;
+        return result;
     },
     create: async (data, onProgress) => {
         const formData = new FormData();
@@ -48,13 +50,14 @@ const Post = {
                     if (onProgress) onProgress(e);
                 }
             });
+            result = result.data;
             dispatchFetchEvent(FETCH_END_EVENT);
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);
-            result = e.response.data;
+            result = e.response;
         }
 
-        return result.data;
+        return result;
     },
     single: async (id) => {
         let result = null;
@@ -62,13 +65,14 @@ const Post = {
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
             result = await getAxios().get(ApiEndpoint.Post.Single(id));
+            result = result.data;
             dispatchFetchEvent(FETCH_END_EVENT);
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);
-            result = e.response?.data;
+            result = e.response;
         }
 
-        return result?.data;
+        return result;
     },
     banners: async () => {
         let result = null;
@@ -76,13 +80,14 @@ const Post = {
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
             result = await getAxios().get(ApiEndpoint.Banner.All);
+            result = result.data;
             dispatchFetchEvent(FETCH_END_EVENT);
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);
-            result = e.response.data;
+            result = e.response;
         }
 
-        return result?.data;
+        return result;
     }
 }
 
