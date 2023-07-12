@@ -1,16 +1,14 @@
 import { useContext, useEffect, useState } from "react";
-import NavBar from "../../partials/NavBar";
-import { useNavigate, useParams } from "react-router-dom";
-import { Path } from "../../../Routes";
 import { FaCalendarAlt, FaCamera, FaClock, FaMapMarkerAlt, FaStar, FaTasks } from "react-icons/fa";
 import Post from "../../../api/Post";
 import MessageBoxContext from "../../../shared/MessageBoxContext";
 import { handleErrors } from "../../../shared/utils";
+import AdminNavBar from "../AdminNavBar";
+import { useParams } from "react-router-dom";
 
 function PostDetailPage() {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(null);
-    const navigate = useNavigate();
     const params = useParams();
 
     const msgBox = useContext(MessageBoxContext);
@@ -30,7 +28,7 @@ function PostDetailPage() {
 
     return (
         <div>
-            <NavBar action="Register User" onAction={() => navigate(Path.Admin.NewUser)} />
+            <AdminNavBar />
             {post &&
                 <div>
                     <div className="md:col-span-12 bg-cover w-full min-h-[12rem] md:min-h-[24rem]" style={{ backgroundImage: "url('" + post.src +"')" }}></div>

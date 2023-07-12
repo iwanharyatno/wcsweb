@@ -29,13 +29,7 @@ const Path = {
         NewUser: '/admin/registeruser',
         MediaDetail: (id) => '/admin/media/' + id
     },
-    ForgotPassword: '/forgot-password',
-    MediaList: {
-        Index: '/list',
-        Video: '/list/video',
-        Photo: '/list/photo',
-        Audio: '/list/audio',
-    }
+    ForgotPassword: '/forgot-password'
 };
 
 const ApiEndpoint = {

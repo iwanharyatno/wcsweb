@@ -7,21 +7,24 @@ import Post from "../../api/Post";
 import { FormInput } from "../../shared/FormInput";
 import { FaSearch } from "react-icons/fa";
 import { handleErrors } from "../../shared/utils";
+import { useSearchParams } from "react-router-dom";
+import { Path } from "../../constants";
 
 function HomePage() {
     const [posts, setPosts] = useState([]);
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [mediaType, setMediaType] = useState(undefined);
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
     const limit = 10;
 
     const msgBox = useContext(MessageBoxContext);
+    const [searchParams] = useSearchParams();
+    const mediaType = searchParams.get('type');
 
     const loadData = async () => {
         setLoading(true);
-        const result = await Post.main({ offset, limit, type: (mediaType === 'home' ? undefined : mediaType), keyword: (searchQuery && searching ? searchQuery : undefined)});
+        const result = await Post.main({ offset, limit, type: (mediaType || undefined), keyword: (searchQuery && searching ? searchQuery : undefined)});
 
         if (handleErrors(msgBox, result)) return;
 
@@ -33,15 +36,14 @@ function HomePage() {
         setLoading(false);
     }
 
-    const loadWithFilter = (mediaType) => {
-        setPosts([]);
-        setMediaType(mediaType);
-        setOffset(0);
-    }
-
     useEffect(() => {
         loadData();
-    }, [offset, mediaType, searching]);
+    }, [offset, searching]);
+
+    useEffect(() => {
+        setPosts([]);
+        loadData();
+    }, [searchParams]);
 
     const searchMedia = (e) => {
         e.preventDefault();
@@ -56,7 +58,24 @@ function HomePage() {
 
     return (
         <>
-            <NavBar selected={mediaType} onNavigate={(m) => loadWithFilter(m.value)} />
+            <NavBar items={[
+                {
+                    text: 'Home',
+                    href: Path.Index
+                },
+                {
+                    text: 'Video',
+                    href: Path.Index + '?type=video'
+                },
+                {
+                    text: 'Photo',
+                    href: Path.Index + '?type=image'
+                },
+                {
+                    text: 'Audio',
+                    href: Path.Index + '?type=audio'
+                }
+            ]} />
             <main className="px-8 max-w-5xl mx-auto">
                 <img src="/banner.png" alt="" className="w-full md:w-auto md:mx-auto my-12" />
                 <div className="md:grid grid-cols-2">

@@ -4,27 +4,28 @@ import { Button, LinkButton } from "../../../shared/Button";
 import { handleErrors, truncate } from "../../../shared/utils";
 import LoadingCircle from "../../../shared/LoadingCircle";
 import { FormInput } from "../../../shared/FormInput";
-import { Link, useNavigate } from "react-router-dom";
-import NavBar from "../../partials/NavBar";
+import { Link, useSearchParams } from "react-router-dom";
 import { Path } from "../../../Routes";
 import MessageBoxContext from "../../../shared/MessageBoxContext";
 import Post from "../../../api/Post";
+import AdminNavBar from "../AdminNavBar";
 
 function HomePage() {
     const [posts, setPosts] = useState(null);
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [mediaType, setMediaType] = useState(undefined);
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
+    const [searchParams] = useSearchParams();
+
     const limit = 10;
+    const mediaType = searchParams.get('type');
 
     const msgBox = useContext(MessageBoxContext);
-    const navigate = useNavigate();
 
     const loadData = async () => {
         setLoading(true);
-        const result = await Post.all({ offset, limit, type: (mediaType === 'home' ? undefined : mediaType), keyword: (searchQuery && searching ? searchQuery : undefined)});
+        const result = await Post.all({ offset, limit, type: (mediaType || undefined), keyword: (searchQuery && searching ? searchQuery : undefined)});
 
         if (handleErrors(msgBox, result)) return;
 
@@ -36,15 +37,14 @@ function HomePage() {
         setLoading(false);
     }
 
-    const loadWithFilter = (mediaType) => {
-        setPosts([]);
-        setMediaType(mediaType);
-        setOffset(0);
-    }
-
     useEffect(() => {
         loadData();
-    }, [offset, mediaType, searching]);
+    }, [offset, searching]);
+
+    useEffect(() => {
+        setPosts([]);
+        loadData();
+    }, [searchParams]);
 
     const searchMedia = (e) => {
         e.preventDefault();
@@ -59,7 +59,7 @@ function HomePage() {
 
     return (
         <div>
-            <NavBar selected={mediaType} onNavigate={(m) => loadWithFilter(m.value)} action="Register User" onAction={() => navigate('/admin/registeruser')} />
+            <AdminNavBar />
             {posts && <>
                 {posts.length > 0 && <MediaHero media={posts[0]} />}
                 <div className="grid md:grid-cols-2 max-w-6xl mx-auto p-8 gap-8">

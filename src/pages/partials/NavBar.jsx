@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import { LinkButton } from "../../shared/Button";
 import ProfilePhoto from "../../shared/ProfilePhoto";
@@ -7,28 +7,9 @@ import { AppConfig } from "../../constants";
 
 const cookies = new Cookies();
 
-function NavBar({ onAction, action, selected, onNavigate }) {
+function NavBar({ onAction, action, items }) {
     const navigate = useNavigate();
     const user = cookies.get(AppConfig.USER_COOKIE_KEY) ? cookies.get(AppConfig.USER_COOKIE_KEY)['data'] : null;
-
-    const menus = [
-        {
-            text: 'Home',
-            value: 'home',
-        },
-        {
-            text: 'Photo',
-            value: 'image'
-        },
-        {
-            text: 'Video',
-            value: 'video'
-        },
-        {
-            text: 'Audio',
-            value: 'audio'
-        }
-    ];
 
     const logout = () => {
         navigate(0);
@@ -39,7 +20,7 @@ function NavBar({ onAction, action, selected, onNavigate }) {
         <nav className="flex items-center p-3 bg-gray-light justify-between">
             <img src="/logo.svg" alt="" />
             <ul className="flex gap-2">
-                {menus.map(m => <li className="text-blue-dark font-bold " key={m.value}><button className={"hover:underline " + ((m.value === selected) ? 'underline' : '')} onClick={() => onNavigate(m)}>{m.text}</button></li>)}
+                {items.map(m => <li className="text-blue-dark font-bold " key={m.href}><NavLink to={m.href}>{m.text}</NavLink></li>)}
             </ul>
             {user ?
                 <ProfilePhoto user={user} image={user.image} onLogout={logout} onAction={onAction} action={action} /> : 
