@@ -22,7 +22,10 @@ function RegisterPage() {
 
     const submitData = async (data) => {
         setLoading(true);
-        const result = await Auth.register(data);
+        const result = await Auth.register({
+            ...data,
+            workType: workType || '-'
+        });
         setLoading(false);
 
         if (handleErrors(msgBox, result)) return;
@@ -61,9 +64,9 @@ function RegisterPage() {
                             <option value="Freelancer">Freelancer</option>
                             <option value="Other">Other</option>
                         </FormSelect>
-                        <FormInput value={phoneNumber} type="number" placeholder="Phone Number" className="block w-full mb-5" onChange={(e) => setPhoneNumber(e.target.value)} />
-                        <FormInput type="email" placeholder="Email" value={email} className="block w-full mb-5" onChange={(e) => setEmail(e.target.value)} />
-                        <FormInput type="password" placeholder="Password" className="block w-full mb-5" onChange={(e) => setPassword(e.target.value)} />
+                        <FormInput value={phoneNumber} type="number" placeholder="Phone Number" className="block w-full mb-5" onChange={(e) => setPhoneNumber(e.target.value)} required/>
+                        <FormInput type="email" placeholder="Email" value={email} className="block w-full mb-5" onChange={(e) => setEmail(e.target.value)} required />
+                        <FormInput type="password" placeholder="Password" className="block w-full mb-5" onChange={(e) => setPassword(e.target.value)} required />
                         <Button variant="pill" className="block w-full mt-20" disabled={loading}>Register</Button>
                     </form>
                 </div>
