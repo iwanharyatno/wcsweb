@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { FaArrowLeft, FaArrowRight, FaCalendarAlt, FaMapMarkerAlt, FaPause, FaPlay, FaSearch } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaCalendarAlt, FaHeadphones, FaMapMarkerAlt, FaPause, FaPlay, FaSearch } from "react-icons/fa";
 import { Button, LinkButton } from "../../../shared/Button";
 import { handleErrors, truncate } from "../../../shared/utils";
 import LoadingCircle from "../../../shared/LoadingCircle";
@@ -9,6 +9,7 @@ import { Path } from "../../../Routes";
 import MessageBoxContext from "../../../shared/MessageBoxContext";
 import Post from "../../../api/Post";
 import AdminNavBar from "../AdminNavBar";
+import Watermark from "../../../shared/Watermark";
 
 function HomePage() {
     const [posts, setPosts] = useState(null);
@@ -117,6 +118,7 @@ function MediaHero() {
             <button className="opacity-50 hover:opacity-100 bg-gray-light text-white text-3xl p-3 rounded-full" onClick={() => nextBanner()}>
                 <FaArrowRight />
             </button>
+            <Watermark />
         </div>
     );
 }
@@ -125,30 +127,34 @@ function MediaItem({ media }) {
     const [playing, setPlaying] = useState(null);
     const [loading, setLoading] = useState(false);
     const videoRef = useRef();
+    const audioRef = useRef();
 
     useEffect(() => {
-        if (videoRef.current) {
-            videoRef.current.addEventListener('ended', () => setPlaying(null));
-        }
+        if (videoRef.current) videoRef.current.addEventListener('ended', () => setPlaying(null));
+        if (audioRef.current) audioRef.current.addEventListener('ended', () => setPlaying(null));
     }, []);
 
     const startPlaying = () => {
-        videoRef.current.play();
+        if (videoRef.current) videoRef.current.play();
+        if (audioRef.current) audioRef.current.play();
         setPlaying(true);
     }
 
     const pausePlaying = () => {
-        videoRef.current.pause();
+        if (videoRef.current) videoRef.current.pause();
+        if (audioRef.current) audioRef.current.pause();
         setPlaying(false);
         setLoading(false);
     }
 
     const renderElement = () => {
-        let element = <div className="bg-contain bg-no-repeat bg-center w-full h-full" style={{ backgroundImage: "url('" + media.media +"')" }}></div>
+        let element = <div className="relative bg-contain min-h-[12rem] bg-no-repeat bg-center w-full h-full" style={{ backgroundImage: "url('" + media.media +"')" }}>
+            <Watermark />
+        </div>
         
         if (media.type === 'video') {
             element = (
-                <div className="group relative overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full">
+                <div className="group min-h-[12rem] relative overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full">
                     <video className="w-full h-auto" poster={media.thumbnail} ref={videoRef} onWaiting={() => setLoading(true)} onCanPlay={() => setLoading(false)}>
                         <source src={media.media} />
                     </video>
@@ -156,8 +162,24 @@ function MediaItem({ media }) {
                         {playing ? <FaPause /> : <FaPlay />}
                     </button>
                     {loading && <LoadingCircle className="absolute top-4 right-4" />}
+                    <Watermark />
                 </div>
             )
+        }
+
+        if (media.type === 'audio') {
+            element = (
+                <div className="group min-h-[8rem] w-full h-full relative overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full">
+                    <audio className="w-full h-auto" ref={audioRef} onWaiting={() => setLoading(true)} onCanPlay={() => setLoading(false)} src={media.media}></audio>
+                    <button className={controlClasses()} onClick={handleControlClick}>
+                        {playing ? <FaPause /> : <FaPlay />}
+                    </button>
+                    <div className="absolute p-3 rounded-full bg-white opacity-10 flex items-center justify-center left-4 top-1/2 -translate-y-1/2">
+                        <FaHeadphones className="text-2xl" />
+                    </div>
+                    {loading && <LoadingCircle className="absolute top-4 right-4" />}
+                </div>
+            );
         }
 
         return element;
@@ -182,7 +204,7 @@ function MediaItem({ media }) {
 
     return (
         <article className="flex flex-col md:flex-row overflow-hidden rounded-2xl shadow-xl">
-            <div className="w-full min-h-[12rem] md:w-1/2 bg-black flex items-center">
+            <div className="relative w-full md:w-1/2 bg-black flex items-center">
                 {renderElement()}
             </div>
             <div className="md:w-1/2 p-5 text-blue-dark">
