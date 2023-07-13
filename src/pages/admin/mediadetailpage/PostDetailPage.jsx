@@ -31,7 +31,7 @@ function PostDetailPage() {
             <AdminNavBar />
             {post &&
                 <div>
-                    <div className="md:col-span-12 bg-cover w-full min-h-[12rem] md:min-h-[24rem]" style={{ backgroundImage: "url('" + post.src +"')" }}></div>
+                    <div className="md:col-span-12 bg-cover w-full min-h-[12rem] md:min-h-[24rem]" style={{ backgroundImage: "url('" + post.media +"')" }}></div>
                     <div className="md:grid gap-4 items-start md:grid-cols-12 max-w-6xl pb-8 mx-8 md:mx-auto mt-12">
                         <article className="md:col-span-5">
                             <h1 className="text-blue-dark fw-bold mb-5 text-4xl">{post.title}</h1>
@@ -47,9 +47,9 @@ function PostDetailPage() {
                             <h2 className="text-3xl fw-bold text-blue-dark mb-4">About the Post</h2>
                             <p className="text-gray">{post.description}</p>
                         </article>
-                        <form className="shadow-2xl rounded-2xl p-4 md:col-start-8 md:col-span-5 text-blue-dark text-center mt-8" action={post.src}>
+                        <div className="shadow-2xl rounded-2xl p-4 md:col-start-8 md:col-span-5 text-blue-dark text-center mt-8" action={post.download_link}>
                             <a href={post.download_link} className="w-full block bg-blue text-white rounded-md hover:bg-blue/75 px-4 py-2" disabled={loading} download>Download</a>
-                        </form>
+                        </div>
                     </div>
                 </div>}
         </div>
