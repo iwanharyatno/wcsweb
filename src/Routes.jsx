@@ -33,7 +33,7 @@ const Routes = [
     {
         path: Path.Admin.Index,
         element: (
-            <AuthProtected redirect={Path.Index} role="admin">
+            <AuthProtected redirect={Path.Index} role="admin" nointended={true}>
                 <Outlet />
             </AuthProtected>
         ),
