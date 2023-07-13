@@ -10,6 +10,7 @@ import MessageBoxContext from "../../../shared/MessageBoxContext";
 import Post from "../../../api/Post";
 import AdminNavBar from "../AdminNavBar";
 import Watermark from "../../../shared/Watermark";
+import Banner from "../../../api/Banner";
 
 function HomePage() {
     const [posts, setPosts] = useState(null);
@@ -61,8 +62,8 @@ function HomePage() {
     return (
         <div>
             <AdminNavBar />
+            <MediaHero />
             {posts && <>
-                {posts.length > 0 && <MediaHero media={posts[0]} />}
                 <div className="grid md:grid-cols-2 max-w-6xl mx-auto p-8 gap-8">
                     <div className="md:col-span-2">
                         <form onSubmit={searchMedia} className="flex justify-end gap-2">
@@ -83,20 +84,22 @@ function HomePage() {
 
 function MediaHero() {
     const [banners, setBanners] = useState([]);
+    const [offset, setOffset] = useState(0);
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const msgBox = useContext(MessageBoxContext);
+    const limit = 10;
 
     useEffect(() => {
         const loadData = async () => {
-            const result = await Post.banners();
+            const result = await Banner.all({ offset, limit });
             
             if (handleErrors(msgBox, result)) return;
 
             if (result) setBanners(result.data)
         };
         loadData();
-    }, []);
+    }, [offset]);
 
     const currentBanner = banners[currentIndex] || {};
 
@@ -106,7 +109,13 @@ function MediaHero() {
     }
 
     const nextBanner = () => {
-        if (currentIndex === banners.length - 1) return;
+        if (currentIndex === banners.length - 1) {
+            setBanners([...banners, {
+                loading: true
+            }]);
+            setOffset(banners.length);
+            return;
+        }
         setCurrentIndex(currentIndex + 1);
     }
 
@@ -118,7 +127,7 @@ function MediaHero() {
             <button className="opacity-50 hover:opacity-100 bg-gray-light text-white text-3xl p-3 rounded-full" onClick={() => nextBanner()}>
                 <FaArrowRight />
             </button>
-            <Watermark />
+            {currentBanner.loading && <LoadingCircle className="text-3xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />}
         </div>
     );
 }

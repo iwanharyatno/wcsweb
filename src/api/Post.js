@@ -73,21 +73,6 @@ const Post = {
         }
 
         return result;
-    },
-    banners: async () => {
-        let result = null;
-
-        try {
-            dispatchFetchEvent(FETCH_START_EVENT);
-            result = await getAxios().get(ApiEndpoint.Banner.All);
-            result = result.data;
-            dispatchFetchEvent(FETCH_END_EVENT);
-        } catch(e) {
-            dispatchFetchEvent(FETCH_FAILED_EVENT);
-            result = e.response;
-        }
-
-        return result;
     }
 }
 

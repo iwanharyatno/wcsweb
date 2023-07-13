@@ -5,7 +5,7 @@
 function handleErrors(msgBox, result) {
     let error;
     if (result && result.status >= 400) {
-        const errors = result.data.errors || ['Failed: ' + result.status];
+        const errors = (result.data.data ? result.data.data.errors : null) || (result.data.meta ? [result.data.meta.message] : [`Failed: ${result.status}`]);
         errors.forEach(msg => {
             msgBox.showMessage({
                 type: 'error',

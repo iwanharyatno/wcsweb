@@ -45,7 +45,7 @@ const ApiEndpoint = {
         Main: (params) => createApiPath('/posts/main', params),
     },
     Banner: {
-        All: createApiPath('/banner')
+        All: (params) => createApiPath('/banner', params)
     }
 }
 
