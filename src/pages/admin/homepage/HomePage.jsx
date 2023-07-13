@@ -84,7 +84,7 @@ function HomePage() {
 
 function MediaHero() {
     const [banners, setBanners] = useState([]);
-    const [offset, setOffset] = useState(0);
+    const [offset] = useState(0);
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const msgBox = useContext(MessageBoxContext);
@@ -101,33 +101,36 @@ function MediaHero() {
         loadData();
     }, [offset]);
 
-    const currentBanner = banners[currentIndex] || {};
-
     const previousBanner = () => {
-        if (currentIndex === 0) return;
+        if (currentIndex === 0) {
+            setCurrentIndex(banners.length - 1);
+            return;
+        }
         setCurrentIndex(currentIndex - 1);
     }
 
     const nextBanner = () => {
         if (currentIndex === banners.length - 1) {
-            setBanners([...banners, {
-                loading: true
-            }]);
-            setOffset(banners.length);
+            setCurrentIndex(0);
             return;
         }
         setCurrentIndex(currentIndex + 1);
     }
 
     return (
-        <div className={'bg-contain relative min-h-screen md:min-h-[40vh] text-white flex justify-between px-8 z-10 items-center gap-2 overflow-hidden'} style={{ backgroundImage: "url('" + currentBanner.media + "')"}}>
-            <button className="opacity-50 hover:opacity-100 bg-gray-light text-white text-3xl p-3 rounded-full" onClick={() => previousBanner()}>
-                <FaArrowLeft />
-            </button>
-            <button className="opacity-50 hover:opacity-100 bg-gray-light text-white text-3xl p-3 rounded-full" onClick={() => nextBanner()}>
-                <FaArrowRight />
-            </button>
-            {currentBanner.loading && <LoadingCircle className="text-3xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />}
+        <div className={'relative min-h-screen md:min-h-[45vh] overflow-hidden'}>
+            {banners.map(b => (
+                <div key={b.id} className={['absolute top-0 left-0 bg-cover bg-center w-full h-full', (banners[currentIndex].id === b.id ? 'animate-slide-in' : 'hidden')].join(' ')} style={{ backgroundImage: `url("${b.media}")`, animationFillMode: 'forwards' }}>
+                </div>
+            ))}
+            <div className="absolute top-0 left-0 w-full h-full text-white flex justify-between px-8 z-10 items-center gap-2">
+                <button className="opacity-50 hover:opacity-100 bg-gray-light text-white text-3xl p-3 rounded-full" onClick={() => previousBanner()}>
+                    <FaArrowLeft />
+                </button>
+                <button className="opacity-50 hover:opacity-100 bg-gray-light text-white text-3xl p-3 rounded-full" onClick={() => nextBanner()}>
+                    <FaArrowRight />
+                </button>
+            </div>
         </div>
     );
 }
@@ -221,7 +224,7 @@ function MediaItem({ media }) {
                 <p className="mb-3">{truncate(media.description, 75)}</p>
                 <p className="flex gap-2 items-center mb-4">
                     <FaCalendarAlt />
-                    {new Date(media.date).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                    {new Date(media.created_at).toLocaleDateString(undefined, { dateStyle: 'long' })}
                 </p>
                 <p className="flex gap-2 items-center mb-6">
                     <FaMapMarkerAlt />

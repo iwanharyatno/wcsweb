@@ -36,10 +36,28 @@ export default {
         'loadingBar': {
           'from': { 'background-position': '200%' },
           'to': { 'background-position': '0%' }
+        },
+        'slide-in': {
+          'from': {
+            'opacity': '0.5'
+          },
+          'to': {
+            'opacity': '1'
+          }
+        },
+        'slide-out': {
+          'from': {
+            'opacity': '1'
+          },
+          'to': {
+            'opacity': '0.5'
+          }
         }
       },
       animation: {
-        'loadingBar': 'loadingBar 1s ease-in-out infinite'
+        'loadingBar': 'loadingBar 1s ease-in-out infinite',
+        'slide-in': 'slide-in 1.5s ease-out',
+        'slide-out': 'slide-out 1s ease-out'
       }
     },
   },
