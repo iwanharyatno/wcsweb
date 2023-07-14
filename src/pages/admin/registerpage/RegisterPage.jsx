@@ -24,7 +24,10 @@ function RegisterPage() {
         setLoading(true);
         const result = await Auth.register({
             ...data,
-            workType: workType || '-'
+            first_name: firstName,
+            last_name: lastName,
+            phone_number: phoneNumber,
+            work_type: workType || '-'
         });
         setLoading(false);
 

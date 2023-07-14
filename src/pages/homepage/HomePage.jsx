@@ -86,10 +86,10 @@ function HomePage() {
                             <Button type="submit"><FaSearch /></Button>
                         </form>
                     </div>
-                    {posts && posts.map(p => <MediaPreview className="h-72" media={p} key={p.id} />)}
+                    {posts ? posts.map(p => <MediaPreview className="h-72" media={p} key={p.id} />) : <div className="font-bold text-center md:col-span-2 text-sm italic text-gray">No Posts, yet.</div>}
                 </div>
                 <div className="text-center mt-4 mb-8">
-                    <Button disabled={loading} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
+                <Button disabled={loading || !posts || !posts.length} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
                 </div>
             </main>
         </>

@@ -62,7 +62,7 @@ function HomePage() {
         <div>
             <AdminNavBar />
             <MediaHero />
-            {posts && <>
+            {posts ? <>
                 <div className="grid md:grid-cols-2 max-w-6xl mx-auto p-8 gap-8">
                     <div className="md:col-span-2">
                         <form onSubmit={searchMedia} className="flex justify-end gap-2">
@@ -73,9 +73,9 @@ function HomePage() {
                     </div>
                     {posts.map(e => <MediaItem media={e} key={e.id} />)}
                 </div>
-            </>}
+            </> : <div className="font-bold text-center text-sm italic text-gray">No Posts, yet.</div>}
             <div className="text-center mt-4 mb-8">
-                <Button disabled={loading} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
+                <Button disabled={loading || !posts || !posts.length} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
             </div>
         </div>
     );
