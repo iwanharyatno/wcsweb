@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { FaArrowLeft, FaArrowRight, FaCalendarAlt, FaMapMarkerAlt, FaSearch } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa";
 import { Button, LinkButton } from "../../../shared/Button";
 import { handleErrors, truncate } from "../../../shared/utils";
 import { FormInput } from "../../../shared/FormInput";
@@ -11,12 +11,13 @@ import AdminNavBar from "../AdminNavBar";
 import Banner from "../../../api/Banner";
 import MediaPreview from "../../../shared/MediaPreview";
 
+let prevSearch = null;
+
 function HomePage() {
     const [posts, setPosts] = useState(null);
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [searching, setSearching] = useState(false);
     const [searchParams] = useSearchParams();
 
     const limit = 10;
@@ -26,8 +27,19 @@ function HomePage() {
 
     const loadData = async () => {
         setLoading(true);
-        const result = await Post.all({ offset, limit, type: (mediaType || undefined), keyword: (searchQuery && searching ? searchQuery : undefined)});
+        const id = +new Date();
+        const abortController = new AbortController();
 
+        if (prevSearch && prevSearch.searchQuery.length) {
+            prevSearch.abortController.abort();
+            prevSearch = null;
+        }
+
+        const result = await Post.all({ offset, limit, type: (mediaType || undefined), keyword: (searchQuery ? searchQuery : undefined)}, abortController);
+
+        prevSearch = { id, abortController, searchQuery };
+
+        if (!result && prevSearch && prevSearch.searchQuery.length) return;
         if (handleErrors(msgBox, result)) return;
 
         if (result && result.data) {
@@ -40,23 +52,12 @@ function HomePage() {
 
     useEffect(() => {
         loadData();
-    }, [offset, searching]);
+    }, [offset, searchQuery]);
 
     useEffect(() => {
         setPosts([]);
         loadData();
     }, [searchParams]);
-
-    const searchMedia = (e) => {
-        e.preventDefault();
-        setSearching(true);
-        if (searching) loadData();
-    };
-
-    const clearSearch = () => {
-        setSearchQuery('');
-        setSearching(false);
-    }
 
     return (
         <div>
@@ -65,10 +66,8 @@ function HomePage() {
             {posts ? <>
                 <div className="grid md:grid-cols-2 max-w-6xl mx-auto p-8 gap-8">
                     <div className="md:col-span-2">
-                        <form onSubmit={searchMedia} className="flex justify-end gap-2">
-                            {searching && <Button type="button" onClick={clearSearch} className="bg-red-medium hover:bg-red-medium/75">Cancel</Button>}
+                        <form onSubmit={(e) => e.preventDefault()} className="flex justify-end gap-2">
                             <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
-                            <Button type="submit"><FaSearch /></Button>
                         </form>
                     </div>
                     {posts.map(e => <MediaItem media={e} key={e.id} />)}

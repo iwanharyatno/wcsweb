@@ -2,7 +2,7 @@
 import { Button } from "./Button";
 import { useNavigate } from "react-router-dom";
 
-function ProfilePhoto({ image, user, onAction, className, onLogout, action }) {
+function ProfilePhoto({ image, user, onAction, className, onLogout, action, text }) {
     const [showDetail, setShowDetail] = useState(false);
 
     const navigate = useNavigate();
@@ -14,7 +14,7 @@ function ProfilePhoto({ image, user, onAction, className, onLogout, action }) {
 
     return (
         <div className={[className, 'relative cursor-pointer'].join(' ')} onClick={() => setShowDetail(!showDetail)}>
-            <Button type="button" variant="pill" background="bg-green hover:bg-green/75">User</Button>
+            <Button type="button" variant="pill" background="bg-green hover:bg-green/75">{text || 'User'}</Button>
             {user &&
                 <div className={'z-50 p-4 absolute bg-white rounded-lg shadow-lg top-16 right-0 w-80 break-words text-center origin-top-right transition-all ' + (showDetail ? 'scale-100 opacity-100' : 'opacity-0 scale-0')}>
                     <img src={image || '/profile-placeholder.svg'} alt={user.fullname + ' Profile'} className="bg-white rounded-full w- h-32 mx-auto mb-3" />

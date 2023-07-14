@@ -7,7 +7,7 @@ import { AppConfig } from "../../constants";
 
 const cookies = new Cookies();
 
-function NavBar({ onAction, action, items }) {
+function NavBar({ onAction, action, items, authText }) {
     const navigate = useNavigate();
     const user = cookies.get(AppConfig.USER_COOKIE_KEY) ? cookies.get(AppConfig.USER_COOKIE_KEY)['data'] : null;
 
@@ -23,7 +23,7 @@ function NavBar({ onAction, action, items }) {
                 {items.map(m => <li className="text-blue-dark font-bold " key={m.href}><NavLink to={m.href}>{m.text}</NavLink></li>)}
             </ul>
             {user ?
-                <ProfilePhoto user={user} image={user.image} onLogout={logout} onAction={onAction} action={action} /> : 
+                <ProfilePhoto user={user} image={user.image} onLogout={logout} onAction={onAction} action={action} text={authText} /> : 
                 <LinkButton to={Path.Login + '?redirect=' + encodeURIComponent(window.location.href)} variant="outlined">Login</LinkButton>}
         </nav>
     )

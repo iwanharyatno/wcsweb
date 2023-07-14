@@ -23,7 +23,7 @@ function AdminNavBar() {
                 text: 'Audio',
                 href: Path.Admin.Index + '?type=audio'
             }
-        ]} />
+        ]} authText="Admin" />
     )
 }
 

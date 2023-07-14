@@ -3,12 +3,14 @@ import { dispatchFetchEvent } from "../events/fetchEvents";
 import getAxios from "../network/getAxios";
 
 const Post = {
-    all: async (params) => {
+    all: async (params, abortController) => {
         let result = null;
 
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
-            result = await getAxios().get(ApiEndpoint.Post.All(params));
+            result = await getAxios().get(ApiEndpoint.Post.All(params), {
+                signal: abortController.signal
+            });
             result = result.data;
             dispatchFetchEvent(FETCH_END_EVENT);
         } catch(e) {
@@ -18,12 +20,14 @@ const Post = {
 
         return result;
     },
-    main: async (params) => {
+    main: async (params, abortController) => {
         let result = null;
 
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
-            result = await getAxios().get(ApiEndpoint.Post.Main(params));
+            result = await getAxios().get(ApiEndpoint.Post.Main(params), {
+                signal: abortController.signal
+            });
             result = result.data;
             dispatchFetchEvent(FETCH_END_EVENT);
         } catch(e) {
