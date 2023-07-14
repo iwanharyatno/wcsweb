@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import LoadingCircle from "./LoadingCircle";
 import Watermark from "./Watermark";
 
-function MediaPreview({ media, className }) {
+function MediaPreview({ media, className, nodesc }) {
 
     let element = (
         <div className={[className, 'flex items-center justify-center w-full h-60 bg-gray-light rounded-md m-2'].join(' ')}>
@@ -19,22 +19,22 @@ function MediaPreview({ media, className }) {
 
     switch(transformedMedia.type) {
         case 'image':
-            element = <ImagePreview media={transformedMedia} className={className} />
+            element = <ImagePreview media={transformedMedia} className={className} nodesc={nodesc} />
             break;
         case 'video':
-            element = <VideoPreview media={transformedMedia} className={className} />
+            element = <VideoPreview media={transformedMedia} className={className} nodesc={nodesc} />
             break;
         case 'audio':
-            element = <AudioPreview media={transformedMedia} className={className} />
+            element = <AudioPreview media={transformedMedia} className={className} nodesc={nodesc} />
     }
     
     return element;
 }
 
-function ImagePreview({ media, className }) {
+function ImagePreview({ media, className, nodesc }) {
     return (
         <div className={["rounded-md m-2 group relative bg-contain bg-no-repeat bg-center overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full bg-black flex items-center", className].join(' ')} style={{ backgroundImage: 'url("' + media.media + '")' }}>
-            <article className="absolute w-full max-h-1/2 bg-black/50 text-white top-0 left-0 p-4 -translate-y-full transition-transform group-hover:translate-y-0">
+            <article className="absolute w-full max-h-1/2 bg-black/50 text-white top-0 left-0 p-4 -translate-y-full transition-transform group-hover:translate-y-0" hidden={nodesc}>
                 <h2 className="mb-2 font-bold">{media.title}</h2>
                 <p className="text-sm">{truncate(media.description, 100)}</p>
             </article>
@@ -43,7 +43,7 @@ function ImagePreview({ media, className }) {
     )
 }
 
-function AudioPreview({ media, className }) {
+function AudioPreview({ media, className, nodesc }) {
     const [playing, setPlaying] = useState(null);
     const [loading, setLoading] = useState(false);
     const audioRef = useRef();
@@ -85,7 +85,7 @@ function AudioPreview({ media, className }) {
     return (
         <div className={["min-h-[8rem] rounded-md m-2 group relative overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full bg-black flex items-center", className].join(' ')}>
             <audio className="w-full h-auto" ref={audioRef} onWaiting={() => setLoading(true)} onCanPlay={() => setLoading(false)} src={media.media}></audio>
-            <article className="absolute w-full max-h-1/2 bg-black/50 text-white top-0 left-0 p-4 -translate-y-full transition-transform group-hover:translate-y-0">
+            <article className="absolute w-full max-h-1/2 bg-black/50 text-white top-0 left-0 p-4 -translate-y-full transition-transform group-hover:translate-y-0" hidden={nodesc}>
                 <h2 className="mb-2 font-bold">{media.title}</h2>
                 <p className="text-sm">{truncate(media.description, 150)}</p>
             </article>
@@ -100,7 +100,7 @@ function AudioPreview({ media, className }) {
     )
 }
 
-function VideoPreview({ media, className }) {
+function VideoPreview({ media, className, nodesc }) {
     const [playing, setPlaying] = useState(null);
     const [loading, setLoading] = useState(false);
     const videoRef = useRef();
@@ -144,7 +144,7 @@ function VideoPreview({ media, className }) {
             <video className="w-full h-auto" poster={media.thumbnail} ref={videoRef} onWaiting={() => setLoading(true)} onCanPlay={() => setLoading(false)}>
                 <source src={media.media} />
             </video>
-            <article className="absolute w-full max-h-1/2 bg-black/50 text-white top-0 left-0 p-4 -translate-y-full transition-transform group-hover:translate-y-0">
+            <article className="absolute w-full max-h-1/2 bg-black/50 text-white top-0 left-0 p-4 -translate-y-full transition-transform group-hover:translate-y-0" hidden={nodesc}>
                 <h2 className="mb-2 font-bold">{media.title}</h2>
                 <p className="text-sm">{truncate(media.description, 150)}</p>
             </article>

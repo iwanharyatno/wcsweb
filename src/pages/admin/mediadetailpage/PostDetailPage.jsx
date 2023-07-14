@@ -5,6 +5,7 @@ import MessageBoxContext from "../../../shared/MessageBoxContext";
 import { handleErrors } from "../../../shared/utils";
 import AdminNavBar from "../AdminNavBar";
 import { useParams } from "react-router-dom";
+import MediaPreview from "../../../shared/MediaPreview";
 
 function PostDetailPage() {
     const [post, setPost] = useState(null);
@@ -31,7 +32,7 @@ function PostDetailPage() {
             <AdminNavBar />
             {post &&
                 <div>
-                    <div className="md:col-span-12 bg-cover w-full min-h-[12rem] md:min-h-[24rem]" style={{ backgroundImage: "url('" + post.media +"')" }}></div>
+                    <MediaPreview className="h-[12rem] md:h-[24rem]" media={post} nodesc></MediaPreview>
                     <div className="md:grid gap-4 items-start md:grid-cols-12 max-w-6xl pb-8 mx-8 md:mx-auto mt-12">
                         <article className="md:col-span-5">
                             <h1 className="text-blue-dark fw-bold mb-5 text-4xl">{post.title}</h1>
