@@ -72,7 +72,7 @@ function PostDetailPage() {
                             <p className="text-gray">{post.description}</p>
                         </article>
                         <div className="shadow-2xl rounded-2xl p-4 md:col-start-8 md:col-span-5 text-blue-dark text-center mt-8" action={post.download_link}>
-                            <Button className="w-full block bg-blue text-white rounded-md hover:bg-blue/75 px-4 py-2" disabled={loading} onClick={() => download("https://7adc7a7821a245.lhr.life")} >Download</Button>
+                            <Button className="w-full block bg-blue text-white rounded-md hover:bg-blue/75 px-4 py-2" disabled={loading} onClick={() => download(post.download_link)}>Download</Button>
                             {!!progress && (
                                 <ProgressBar className="mt-4" value={progress} label="Downloading" />
                             )}
