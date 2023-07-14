@@ -7,15 +7,15 @@ import AdminNavBar from "../AdminNavBar";
 import { useParams } from "react-router-dom";
 import MediaPreview from "../../../shared/MediaPreview";
 import { Button } from "../../../shared/Button";
-import ProgressBar from "../../../shared/ProgressBar";
+import DownloadContext from "../../../shared/DownloadContext";
 
 function PostDetailPage() {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(null);
-    const [progress, setProgress] = useState(0);
     const params = useParams();
 
     const msgBox = useContext(MessageBoxContext);
+    const downoadManager = useContext(DownloadContext);
 
     useEffect(() => {
         const loadData = async () => {
@@ -30,25 +30,9 @@ function PostDetailPage() {
         loadData();
     }, [params]);
 
-    const download = async (url) => {
-        setLoading(true);
-        const result = await Post.downloadMedia(url, (p) => {
-            setProgress(p.progress * 100);
-        });
-        setLoading(false);
-        setProgress(0);
-
-        if (handleErrors(msgBox, result)) return;
-
-        const href = URL.createObjectURL(result.data);
-        const ext = result.headers['content-type'].split('/')[1];
-
-        const link = document.createElement('a');
-        link.href = href;
-        link.setAttribute('download', `${post.title}.${ext}`);
-        link.click();
-
-        URL.revokeObjectURL(result.data);
+    const download = () => {
+        downoadManager.setVisible(true);
+        downoadManager.startDownload(post);
     }
 
     return (
@@ -72,10 +56,7 @@ function PostDetailPage() {
                             <p className="text-gray">{post.description}</p>
                         </article>
                         <div className="shadow-2xl rounded-2xl p-4 md:col-start-8 md:col-span-5 text-blue-dark text-center mt-8" action={post.download_link}>
-                            <Button className="w-full block bg-blue text-white rounded-md hover:bg-blue/75 px-4 py-2" disabled={loading} onClick={() => download(post.download_link)}>Download</Button>
-                            {!!progress && (
-                                <ProgressBar className="mt-4" value={progress} label="Downloading" />
-                            )}
+                            <Button className="w-full block bg-blue text-white rounded-md hover:bg-blue/75 px-4 py-2" disabled={loading} onClick={() => download()}>Download</Button>
                         </div>
                     </div>
                 </div>}

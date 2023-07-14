@@ -74,15 +74,19 @@ const Post = {
 
         return result;
     },
-    downloadMedia: async (url, onProgress) => {
+    downloadMedia: async (url, abortController, onProgress) => {
         let result = null;
 
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
+            let startDownload = false;
             result = await getAxios().get(url, {
+                signal: abortController.signal,
                 responseType: 'blob',
                 onDownloadProgress: (e) => {
+                    if (!startDownload) dispatchFetchEvent(FETCH_END_EVENT);
                     if (onProgress) onProgress(e);
+                    startDownload = true;
                 }
             });
             dispatchFetchEvent(FETCH_END_EVENT);

@@ -28,7 +28,7 @@ function HomePage() {
 
         if (handleErrors(msgBox, result)) return;
 
-        if (result) {
+        if (result && result.data) {
             if (offset !== 0) setPosts([...posts, ...result.data]);
             else setPosts(result.data);
         }
