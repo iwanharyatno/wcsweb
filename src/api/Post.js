@@ -73,6 +73,25 @@ const Post = {
         }
 
         return result;
+    },
+    downloadMedia: async (url, onProgress) => {
+        let result = null;
+
+        try {
+            dispatchFetchEvent(FETCH_START_EVENT);
+            result = await getAxios().get(url, {
+                responseType: 'blob',
+                onDownloadProgress: (e) => {
+                    if (onProgress) onProgress(e);
+                }
+            });
+            dispatchFetchEvent(FETCH_END_EVENT);
+        } catch(e) {
+            dispatchFetchEvent(FETCH_FAILED_EVENT);
+            result = e.response;
+        }
+
+        return result;
     }
 }
 

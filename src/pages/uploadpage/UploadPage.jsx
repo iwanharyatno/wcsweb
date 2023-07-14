@@ -8,6 +8,7 @@ import MessageBoxContext from "../../shared/MessageBoxContext";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../../constants";
 import { handleErrors } from "../../shared/utils";
+import ProgressBar from "../../shared/ProgressBar";
 
 function UploadPage() {
     const [data, setData] = useState({});
@@ -106,10 +107,7 @@ function UploadPage() {
                         <input type="file" accept="image/*, video/*, audio/*" id="media" className="hidden" onChange={(e) => setData({...data, media: e.target.files[0]})} />
                     </div>
                     {loading && <div className={'mb-4 lg:block lg:col-span-2 ' + (step === 2 ? 'block' : 'hidden')}>
-                        <div className="relative py-2 px-4 rounded-md bg-gray-light">
-                            <div className="rounded-md absolute top-0 left-0 bg-gradient-to-r from-green-light from-30% via-white to-green-light to-70% bg-[length:200%] animate-loadingBar h-full" style={{ width: uploadProgress + '%' }}></div>
-                            <span className="relative">Uploading... {uploadProgress.toFixed(2)}%</span>
-                        </div>
+                        <ProgressBar value={uploadProgress} label="Uploading" />
                     </div>}
                     <div className={'mb-4 lg:block ' + (step === 1 ? 'block' : 'hidden')}>
                         <label htmlFor="mediagrapher" className="font-bold text-blue-dark mb-3 block">Photographer/Videographer</label>
