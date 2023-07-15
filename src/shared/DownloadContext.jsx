@@ -6,6 +6,11 @@ import { Button } from "./Button";
 
 const DownloadContext = createContext({});
 
+function downloadBeforeUnloadListener(event) {
+    event.preventDefault();
+    return (event.returnValue = "");
+}
+
 function DownloadContextProvider({ children }) {
     const [downloads, setDownloads] = useState([]);
     const [show, setShow] = useState(true);
@@ -13,6 +18,24 @@ function DownloadContextProvider({ children }) {
     const removeDownload = (id) => {
         setDownloads(downloads.filter(m => m.id !== id));
     };
+
+    const setFinished = (id) => {
+        const updated = [...downloads];
+        const target = updated.find(d => d.id == id);
+        target.finished = true;
+        const index = updated.findIndex(d => d.id == id);
+        updated[index] = target;
+        setDownloads(updated);
+    }
+
+    useEffect(() => {
+        const unfinishedDownload = downloads.filter(d => !d.finished);
+        if (unfinishedDownload.length > 0) {
+            addEventListener('beforeunload', downloadBeforeUnloadListener, { capture: true });
+        } else {
+            removeEventListener('beforeunload', downloadBeforeUnloadListener, { capture: true });
+        }
+    }, [downloads]);
   
     const addDownload = (post) => {
         const updated = [...downloads];
@@ -44,7 +67,7 @@ function DownloadContextProvider({ children }) {
                 )}</Button>
                 <div className={['z-40 md:rounded-md divide-y divide-gray-light top-12 md:top-14 w-full md:left-2 md:w-96 flex flex-col gap-3 p-4 bg-white max-h-[80vh] overflow-auto', show ? 'fixed' : 'hidden'].join(' ')}>
                     <p className="text-lg">Downloads</p>
-                    {downloads.map(m => <DownloadBox detail={m} onClose={(id) => removeDownload(id)} key={m.id} />)}
+                    {downloads.map(m => <DownloadBox detail={m} onClose={(id) => removeDownload(id)} key={m.id} onFinished={(id) => setFinished(id)} />)}
                 </div>
             </div>}
         {children}
@@ -52,13 +75,14 @@ function DownloadContextProvider({ children }) {
     )
 }
 
-function DownloadBox({ detail, onClose }) {
+function DownloadBox({ detail, onClose, onFinished }) {
     const [progress, setProgress] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [failed, setFailed] = useState(false);
 
     const cancelDownload = () => {
         detail.abortController.abort();
-        if (progress.toFixed(0) == 100 && onClose) onClose(detail.id);
+        if ((progress.toFixed(0) == 100 || failed) && onClose) onClose(detail.id);
     }
 
     useEffect(() => {
@@ -70,7 +94,8 @@ function DownloadBox({ detail, onClose }) {
             });
     
             if (!result) {
-                if (onClose) onClose(detail.id);
+                setFailed(true);
+                onFinished(detail.id);
                 return;
             }
     
@@ -83,6 +108,7 @@ function DownloadBox({ detail, onClose }) {
             link.click();
     
             URL.revokeObjectURL(result.data);
+            onFinished(detail.id);
         }
         download();
     }, []);
@@ -91,7 +117,7 @@ function DownloadBox({ detail, onClose }) {
         <div className={'z-50 w-auto flex flex-col gap-2 p-3 bg-white'}>
             <p className="font-bold">Media: {detail.post.title}</p>
             <div className="flex items-center gap-2">
-                <ProgressBar className="grow" value={progress} label={(loading ? 'Preparing for download' : progress === 1 ? 'Download completed' : 'Downloading')} />
+                <ProgressBar className="grow" value={progress} label={(loading ? 'Preparing for download' : progress === 1 ? 'Download completed' : 'Downloading')} failed={failed} />
                 <button className="hover:opacity-50" onClick={cancelDownload} aria-label="cancel download">
                     <FaTimes />
                 </button>

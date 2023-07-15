@@ -27,7 +27,10 @@ const Path = {
     Admin: {
         Index: '/admin',
         NewUser: '/admin/registeruser',
-        MediaDetail: (id) => '/admin/media/' + id
+        MediaDetail: (id) => '/admin/media/' + id,
+        Users: {
+            Index: '/admin/users'
+        }
     },
     ForgotPassword: '/forgot-password'
 };

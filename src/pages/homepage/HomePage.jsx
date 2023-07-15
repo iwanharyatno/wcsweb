@@ -58,24 +58,33 @@ function HomePage() {
 
     return (
         <>
-            <NavBar items={[
-                {
-                    text: 'Home',
-                    href: Path.Index
-                },
-                {
-                    text: 'Video',
-                    href: Path.Index + '?type=video'
-                },
-                {
-                    text: 'Photo',
-                    href: Path.Index + '?type=image'
-                },
-                {
-                    text: 'Audio',
-                    href: Path.Index + '?type=audio'
-                }
-            ]} authText="User" />
+            <NavBar
+                items={[
+                    {
+                        text: 'Home',
+                        href: Path.Index
+                    },
+                    {
+                        text: 'Video',
+                        href: Path.Index + '?type=video'
+                    },
+                    {
+                        text: 'Photo',
+                        href: Path.Index + '?type=image'
+                    },
+                    {
+                        text: 'Audio',
+                        href: Path.Index + '?type=audio'
+                    }
+                ]}
+                actions={[
+                    {
+                        id: 1,
+                        text: "Upload Media",
+                        href: Path.User.Upload
+                    }
+                ]}
+                authText="User" />
             <main className="px-8 max-w-5xl mx-auto">
                 <img src="/banner.png" alt="" className="w-full md:w-auto md:mx-auto my-12" />
                 <div className="md:grid grid-cols-2">
