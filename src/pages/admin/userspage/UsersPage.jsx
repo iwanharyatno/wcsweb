@@ -213,31 +213,37 @@ function UserRow({ user, index, onEdit, onDelete, onShow }) {
         if (!objectEqual(data, user)) {
             const updated = {...latestData, ...data};
             onEdit(updated, (err) => {
+                setLoading(false);
                 if (err) {
                     setData(latestData);
                     return;
                 }
                 setLatestData(updated);
-                setLoading(false);
             });
             setLoading(true);
         }
     }, [data]);
 
+    const updateData = (propName, value) => {
+        const d = {...data};
+        d[propName] = value;
+        setData(d);
+    }
+
     return (
-        <tr className={["z-10 relative hover:bg-gray-light", loading ? 'after:bg-black/20 w-full h-full top-0 left-0' : ''].join(' ')}>
+        <tr className={['z-10 hover:bg-gray-light relative', (loading) ? 'after:absolute after:bg-black/40 after:w-full after:h-full after:top-0 after:left-0' : ''].join(' ')}>
             <td className="text-center py-2">{index}</td>
             <td>
-                <TextEditable type="text" value={data.fullname || ''} onChange={(value) => setData({...data, fullname: value})} />
+                <TextEditable type="text" value={data.fullname || ''} onChange={(value) => updateData('fullname', value)} />
             </td>
             <td>
-                <TextEditable type="email" value={data.email || ''} onChange={(value) => setData({...data, email: value})} />
+                <TextEditable type="email" value={data.email || ''} onChange={(value) => updateData('email', value)} />
             </td>
             <td>
-                <TextEditable type="number" value={data.phone_number || ''} onChange={(value) => setData({...data, phone_number: value})} />
+                <TextEditable type="number" value={data.phone_number || ''} onChange={(value) => updateData('phone_number', value)} />
             </td>
             <td>
-                <TextEditable type="select" value={data.work_type || ''} onChange={(value) => setData({...data, work_type: value})}>
+                <TextEditable type="select" value={data.work_type || ''} onChange={(value) => updateData('work_type', value)}>
                     <option value="">-- Select WorkType --</option>
                     <option value="Student">Student</option>
                     <option value="Employee">Employee</option>
