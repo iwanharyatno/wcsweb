@@ -8,6 +8,7 @@ import { Path } from "./constants";
 import AuthProtected from "./shared/AuthProtected";
 import { Outlet } from "react-router-dom";
 import ForgotPassword from "./pages/forgotpassword/ForgotPassword";
+import UsersPage from "./pages/admin/userspage/UsersPage";
 
 const Routes = [
     {
@@ -49,6 +50,10 @@ const Routes = [
             {
                 path: Path.Admin.MediaDetail(':id'),
                 element: <MediaDetailPage />
+            },
+            {
+                path: Path.Admin.Users.Index,
+                element: <UsersPage />
             }
         ]
     }

@@ -49,6 +49,11 @@ const ApiEndpoint = {
     },
     Banner: {
         All: (params) => createApiPath('/banner', params)
+    },
+    User: {
+        Detail: (id) => createApiPath('/users/' + id),
+        Update: (id) => createApiPath('/users/' + id),
+        Delete: (id) => createApiPath('/users/' + id),
     }
 }
 

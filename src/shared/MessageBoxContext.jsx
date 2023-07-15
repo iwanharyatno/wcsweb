@@ -1,4 +1,4 @@
-﻿import { createContext, useState } from "react";
+﻿import { createContext, useEffect, useRef, useState } from "react";
 import {
     FaCheckCircle,
     FaInfoCircle,
@@ -7,16 +7,46 @@ import {
     FaTimes
 } from 'react-icons/fa'
 
-function MessageBox({ id, message, type, onClose }) {
+function MessageBox({ id, message, type, timer, action, onTimeout, onClose }) {
+    const [countdown, setCountdown] = useState(timer);
+
     const icon = iconFromType(type);
     const color = colorFromType(type);
 
+    const canceledRef = useRef(false);
+
+    useEffect(() => {
+        const countDownCallback = (value) => {
+            const next = value - 1;
+
+            if (canceledRef.current) return;
+            if (next == 0) {
+                if (onTimeout) onTimeout();
+                onClose(id);
+                return;
+            }
+
+            setCountdown(next);
+            setTimeout(() => countDownCallback(next), 1000)
+        }
+        setTimeout(() => countDownCallback(countdown || 0), 1000);
+    }, []);
+
+    const handleAction = (e) => {
+        e.stopPropagation();
+        if (action) {
+            action.onAction();
+            canceledRef.current = true;
+        }
+        onClose(id);
+    }
+
     return (
-        <div className={'z-50 w-auto flex shadow-md rounded-md items-center p-3 cursor-pointer active:scale-90 transition-transform ' + color} onClick={() => onClose(id)}>
-            <div className="mr-4">{icon}</div>
+        <div className={'z-50 w-auto flex shadow-md rounded-md items-center p-3 cursor-pointer active:scale-90 transition-transform ' + color} onClick={handleAction}>
+            <div className="mr-4">{timer ? countdown : icon}</div>
             <p className="grow mr-4">{message}</p>
-            <button className="hover:opacity-50" onClick={() => onClose(id)}>
-                <FaTimes />
+            <button className="hover:opacity-50" onClick={handleAction}>
+                {action ? action.text : <FaTimes />}
             </button>
         </div>
     )
@@ -78,18 +108,18 @@ function MessageBoxContextProvider({ children }) {
         setMessages(messages.filter(m => m.id !== id));
     };
   
-    const addMessage = ({ type, message }) => {
+    const addMessage = (message) => {
         const updated = [...messages];
         updated.push({
             id: +new Date(),
-            type, message
+            ...message
         });
         setMessages(updated);
     };
   
     return (
       <MessageBoxContext.Provider value={{
-        showMessage: (message) => addMessage(message)
+        showMessage: addMessage
     }}>
         {messages.length > 0 &&
             <div className="z-50 fixed top-0 w-full md:right-0 md:w-96 flex flex-col gap-3 p-4">

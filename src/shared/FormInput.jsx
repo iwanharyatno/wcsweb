@@ -1,20 +1,20 @@
-﻿import { useState } from 'react';
+﻿import { forwardRef, useState } from 'react';
 import {
     FaEye,
     FaEyeSlash
 } from 'react-icons/fa';
 
-function FormInput({ variant, size, className, type, ...rest }) {
+const FormInput = forwardRef(function FormInput({ variant, size, className, type, ...rest }, ref) {
     const [show, setShow] = useState(false);
 
     const variantClasses = fromVariant(variant);
     const sizeClasses = fromSize(size);
 
     const final = type !== 'password' ?
-        <input {...rest} type={type} className={[variantClasses, sizeClasses, className].join(' ')} /> :
+        <input ref={ref} {...rest} type={type} className={[variantClasses, sizeClasses, className].join(' ')} /> :
         (
             <div className={[className, variantClasses, "flex"].join(' ')}>
-                <input {...rest} className={[sizeClasses, 'bg-transparent', 'grow'].join(' ')} type={show ? 'text' : 'password'} />
+                <input ref={ref} {...rest} className={[sizeClasses, 'bg-transparent', 'grow'].join(' ')} type={show ? 'text' : 'password'} />
                 <button type="button" className="text-gray hover:opacity-50 px-3" onClick={() => setShow(!show)}>
                     { show ? <FaEyeSlash /> : <FaEye /> }
                 </button>
@@ -22,25 +22,25 @@ function FormInput({ variant, size, className, type, ...rest }) {
         )
 
     return final;
-}
+});
 
-function FormTextArea({ variant, size, className, ...rest }) {
+const FormTextArea = forwardRef(function FormTextArea({ variant, size, className, ...rest }, ref) {
     const classes = fromVariantAndSize(variant, size);
 
     return (
-        <textarea {...rest} className={[classes, 'font-inherit ' + className].join(' ')}></textarea>
+        <textarea ref={ref} {...rest} className={[classes, 'font-inherit ' + className].join(' ')}></textarea>
     )
-}
+});
 
-function FormSelect({ variant, size, className, children, ...rest }) {
+const FormSelect = forwardRef(function FormSelect({ variant, size, className, children, ...rest }, ref) {
     const classes = fromVariantAndSize(variant, size);
 
     return (
-        <select {...rest} className={[classes, className].join(' ')}>
+        <select ref={ref} {...rest} className={[classes, className].join(' ')}>
             {children}
         </select>
     )
-}
+});
 
 function fromVariantAndSize(variant, size) {
     const variantClass = fromVariant(variant);

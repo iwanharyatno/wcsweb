@@ -46,7 +46,6 @@ function LoginPage() {
 
         if (handleErrors(msgBox, result)) return;
 
-        console.log(result.data.data);
         if (result.data.data.role === 'admin') {
             navigate(Path.Admin.Index);
             return;
