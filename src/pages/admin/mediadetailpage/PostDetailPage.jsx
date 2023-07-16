@@ -40,7 +40,7 @@ function PostDetailPage() {
             <AdminNavBar />
             {post &&
                 <div>
-                    <MediaPreview className="h-[12rem] md:h-[24rem]" media={post} nodesc></MediaPreview>
+                    <MediaPreview scaleType="crop" className="h-[12rem] md:h-[24rem]" media={post} nodesc></MediaPreview>
                     <div className="md:grid gap-4 items-start md:grid-cols-12 max-w-6xl pb-8 mx-8 md:mx-auto mt-12">
                         <article className="md:col-span-5">
                             <h1 className="text-blue-dark fw-bold mb-5 text-4xl">{post.title}</h1>

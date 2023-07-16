@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import LoadingCircle from "./LoadingCircle";
 import Watermark from "./Watermark";
 
-function MediaPreview({ media, className, nodesc }) {
+function MediaPreview({ media, className, nodesc, scaleType }) {
 
     let element = (
         <div className={[className, 'flex items-center justify-center w-full h-60 bg-gray-light rounded-md m-2'].join(' ')}>
@@ -19,7 +19,7 @@ function MediaPreview({ media, className, nodesc }) {
 
     switch(transformedMedia.type) {
         case 'image':
-            element = <ImagePreview media={transformedMedia} className={className} nodesc={nodesc} />
+            element = <ImagePreview media={transformedMedia} className={className} nodesc={nodesc} scaleType={scaleType} />
             break;
         case 'video':
             element = <VideoPreview media={transformedMedia} className={className} nodesc={nodesc} />
@@ -31,9 +31,20 @@ function MediaPreview({ media, className, nodesc }) {
     return element;
 }
 
-function ImagePreview({ media, className, nodesc }) {
+function ImagePreview({ media, className, nodesc, scaleType }) {
+    const imgClass = () => {
+        let result = 'w-full h-full';
+
+        if (scaleType == 'crop') {
+            result = 'w-full h-auto';
+        }
+
+        return result;
+    }
+
     return (
-        <div className={["rounded-md m-2 group relative bg-contain bg-no-repeat bg-center overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full bg-black flex items-center", className].join(' ')} style={{ backgroundImage: 'url("' + media.media + '")' }}>
+        <div className={["rounded-md m-2 group relative overflow-hidden after:absolute after:top-0 after:left-0 after:w-full after:h-full bg-black flex items-center", className].join(' ')}>
+            <img src={media.media} alt={media.title} className={imgClass()}/>
             <article className="absolute w-full max-h-1/2 bg-black/50 text-white top-0 left-0 p-4 -translate-y-full transition-transform group-hover:translate-y-0" hidden={nodesc}>
                 <h2 className="mb-2 font-bold">{media.title}</h2>
                 <p className="text-sm">{truncate(media.description, 100)}</p>
