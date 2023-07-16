@@ -100,7 +100,22 @@ const Post = {
         }
 
         return result;
-    }
+    },
+    update: async (id, data) => {
+        let result = null;
+
+        try {
+            dispatchFetchEvent(FETCH_START_EVENT);
+            result = await getAxios().put(ApiEndpoint.Post.Update(id), data);
+            result = result.data;
+        } catch(e) {
+            dispatchFetchEvent(FETCH_FAILED_EVENT);
+            result = e.response;
+        }
+        dispatchFetchEvent(FETCH_END_EVENT);
+
+        return result;
+    },
 }
 
 export default Post;

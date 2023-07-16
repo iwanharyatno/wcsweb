@@ -44,6 +44,7 @@ const ApiEndpoint = {
     Post: {
         Create: createApiPath('/posts/store'),
         Single: (id) => createApiPath('/posts/' + id),
+        Update: (id) => createApiPath('/posts/' + id + '/update'),
         All: (params) => createApiPath('/posts', params),
         Main: (params) => createApiPath('/posts/main', params),
     },
