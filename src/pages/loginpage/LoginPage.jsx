@@ -20,13 +20,19 @@ function LoginPage() {
     const msgBox = useContext(MessageBoxContext);
     const navigate = useNavigate();
 
-    const redirect = () => {
+    const redirect = (role) => {
+        console.log(searchParams.get('redirect'));
         if (searchParams.size > 0) {
             const redirectUrl = new URL(searchParams.get('redirect'));
             if (redirectUrl.origin === window.location.origin) {
                 navigate(redirectUrl.pathname);
                 return;
             }
+        }
+
+        if (role === 'admin') {
+            navigate(Path.Admin.Index);
+            return;
         }
         navigate('/');
     }
@@ -46,12 +52,7 @@ function LoginPage() {
 
         if (handleErrors(msgBox, result)) return;
 
-        if (result.data.data.role === 'admin') {
-            navigate(Path.Admin.Index);
-            return;
-        }
-
-        redirect();
+        redirect(result.data.data.role);
     }
 
     return (

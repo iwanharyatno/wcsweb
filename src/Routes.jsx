@@ -13,7 +13,11 @@ import UsersPage from "./pages/admin/userspage/UsersPage";
 const Routes = [
     {
         path: Path.Index,
-        element: <HomePage />
+        element: (
+            <AuthProtected redirect={Path.Login}>
+                <HomePage />
+            </AuthProtected>
+        )
     },
     {
         path: Path.Login,
@@ -29,12 +33,16 @@ const Routes = [
     },
     {
         path: Path.ForgotPassword,
-        element: <ForgotPassword />
+        element: (
+            <AuthProtected redirect={Path.Login}>
+                <ForgotPassword />
+            </AuthProtected>
+        )
     },
     {
         path: Path.Admin.Index,
         element: (
-            <AuthProtected redirect={Path.Index} role="admin" nointended={true}>
+            <AuthProtected redirect={Path.Login} role="admin">
                 <Outlet />
             </AuthProtected>
         ),
