@@ -136,7 +136,7 @@ function MediaHero() {
 function MediaItem({ media }) {
     return (
         <article className="flex flex-col md:flex-row overflow-hidden rounded-2xl shadow-xl">
-            <MediaPreview className="min-h-[12rem] relative w-full md:w-1/2" nodesc media={media} />
+            <MediaPreview className="min-h-[12rem] relative w-full md:w-1/2 m-0 rounded-none" nodesc media={media} />
             <div className="md:w-1/2 p-5 text-blue-dark">
                 <Link to={Path.Admin.MediaDetail(media.id)} className="text-xl font-bold mb-3 block hover:underline">{media.title}</Link>
                 <p className="mb-3">{truncate(media.description, 75)}</p>
