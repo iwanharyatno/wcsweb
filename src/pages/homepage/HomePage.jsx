@@ -40,9 +40,9 @@ function HomePage() {
             return;
         }
 
-        if (result && result.data) {
-            if (offset !== 0) setPosts([...posts, ...result.data]);
-            else setPosts(result.data);
+        if (result) {
+            if (offset !== 0 && result.data) setPosts([...posts, ...result.data]);
+            else setPosts(result.data || []);
         }
         setLoading(false);
     }
@@ -93,7 +93,7 @@ function HomePage() {
                             <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
                         </form>
                     </div>
-                    {posts ? posts.map(p => <MediaPreview className="h-72" media={p} key={p.id} />) : <div className="font-bold text-center md:col-span-2 text-sm italic text-gray">No Posts, yet.</div>}
+                    {posts && posts.length ? posts.map(p => <MediaPreview className="h-72" media={p} key={p.id} />) : <div className="font-bold text-center md:col-span-2 text-sm italic text-gray">No Posts, yet.</div>}
                 </div>
                 <div className="text-center mt-4 mb-8">
                 <Button disabled={loading || !posts || !posts.length} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>

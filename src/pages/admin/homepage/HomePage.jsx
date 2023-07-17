@@ -42,9 +42,9 @@ function HomePage() {
         if (!result && prevSearch && prevSearch.searchQuery.length) return;
         if (handleErrors(msgBox, result)) return;
 
-        if (result && result.data) {
-            if (offset !== 0) setPosts([...posts, ...result.data]);
-            else setPosts(result.data);
+        if (result) {
+            if (offset !== 0 && result.data) setPosts([...posts, ...result.data]);
+            else setPosts(result.data || []);
         }
         
         setLoading(false);
@@ -63,16 +63,14 @@ function HomePage() {
         <div>
             <AdminNavBar />
             <MediaHero />
-            {posts ? <>
-                <div className="grid md:grid-cols-2 max-w-6xl mx-auto p-8 gap-8">
-                    <div className="md:col-span-2">
-                        <form onSubmit={(e) => e.preventDefault()} className="flex justify-end gap-2">
-                            <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
-                        </form>
-                    </div>
-                    {posts.map(e => <MediaItem media={e} key={e.id} />)}
+            <div className="grid md:grid-cols-2 max-w-6xl mx-auto p-8 gap-8">
+                <div className="md:col-span-2">
+                    <form onSubmit={(e) => e.preventDefault()} className="flex justify-end gap-2">
+                        <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
+                    </form>
                 </div>
-            </> : <div className="font-bold text-center text-sm italic text-gray">No Posts, yet.</div>}
+                {posts && posts.length ? posts.map(e => <MediaItem media={e} key={e.id} />) : <div className="col-span-2 font-bold text-center text-sm italic text-gray">No Posts, yet.</div>}
+            </div>
             <div className="text-center mt-4 mb-8">
                 <Button disabled={loading || !posts || !posts.length} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
             </div>
