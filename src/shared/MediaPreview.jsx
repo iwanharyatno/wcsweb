@@ -191,7 +191,7 @@ function VideoPreview({ media, className, nodesc }) {
             </button>
             {loading && <LoadingCircle className="absolute top-4 right-4" />}
             <VideoBottomBar
-                valueSecs={progress} totalSecs={videoRef.current?.duration || 0} onJump={jumpToPercent} 
+                valueSecs={progress} totalSecs={videoRef.current?.duration} onJump={jumpToPercent} 
                 currentLevel={hlsRef.current?.currentLevel || -1} levels={hlsRef.current?.levels || []} onLevelChanged={updateLevel} />
             <Watermark />
         </div>
@@ -238,7 +238,7 @@ function VideoBottomBar({ valueSecs, totalSecs, levels, currentLevel, onLevelCha
             </div>
             <div className="w-full relative bg-white/30 h-1 cursor-pointer" onClick={calculateJumps} ref={progresBarRef}>
                 <div className="bg-white h-2 w-2 hover:h-3 hover:w-3 rounded-full absolute top-1/2 -translate-y-1/2 -translate-x-1/2" style={{ left: (precentages || 0) + '%' }}></div>
-                <div className="h-full bg-white" style={{ width: precentages + '%' }}></div>
+                <div className="h-full bg-white" style={{ width: (precentages || 0) + '%' }}></div>
             </div>
         </div>
     )
