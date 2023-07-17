@@ -13,7 +13,7 @@ function createApiPath(path, params = {}) {
     }).filter(v => v);
 
     const result = AppConfig.API_VERSION_URL + path;
-    if (keys.length === 0) return result;
+    if (urlParams.length === 0) return result;
 
     return result + '?' + urlParams.join('&');
 }
@@ -52,6 +52,7 @@ const ApiEndpoint = {
         All: (params) => createApiPath('/banner', params)
     },
     User: {
+        All: (params) => createApiPath('/users', params),
         Detail: (id) => createApiPath('/users/' + id),
         Update: (id) => createApiPath('/users/' + id),
         Delete: (id) => createApiPath('/users/' + id),

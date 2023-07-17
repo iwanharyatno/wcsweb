@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import { Path } from "../../../constants";
 import User from "../../../api/User";
 
+let prevSearch;
+
 function UsersPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
@@ -18,32 +20,20 @@ function UsersPage() {
     const msgBox = useContext(MessageBoxContext);
 
     useEffect(() => {
-        setUsers([
-            {
-                id: 1,
-                fullname: 'Lorem Ipsum',
-                email: 'loremipsum@lorem.com',
-                phone_number: '083128339244'
-            },
-            {
-                id: 2,
-                fullname: 'Adispicing Elit',
-                email: 'adielit@lorem.com',
-                phone_number: '083128339244'
-            },
-            {
-                id: 3,
-                fullname: 'Consetetur',
-                email: 'consetetur@lorem.com',
-                phone_number: '083128339244'
-            },
-            {
-                id: 4,
-                fullname: 'Aliquam Nulla',
-                email: 'loremipsum@lorem.com',
-                phone_number: '083128339244'
-            },
-        ]);
+        const loadData = async () => {
+            if (prevSearch && prevSearch.searchQuery.length) {
+                prevSearch.abortController.abort();
+                prevSearch = null;
+            }
+
+            const result = await User.all({ searchQuery: (searchQuery || undefined) });
+            const abortController = new AbortController();
+            prevSearch = { searchQuery, abortController };
+            if (handleErrors(msgBox, result)) return;
+
+            setUsers(result.data);
+        };
+        loadData();
     }, [searchQuery]);
 
     const cancelDelete = (target) => {
