@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { FormInput } from "../../shared/FormInput";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../shared/Button";
 import { Path } from "../../Routes";
 import Auth from "../../api/Auth";
@@ -15,21 +15,11 @@ function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [remember, setRemember] = useState(false);
-    const [searchParams] = useSearchParams();
 
     const msgBox = useContext(MessageBoxContext);
     const navigate = useNavigate();
 
     const redirect = (role) => {
-        console.log(searchParams.get('redirect'));
-        if (searchParams.size > 0) {
-            const redirectUrl = new URL(searchParams.get('redirect'));
-            if (redirectUrl.origin === window.location.origin) {
-                navigate(redirectUrl.pathname);
-                return;
-            }
-        }
-
         if (role === 'admin') {
             navigate(Path.Admin.Index);
             return;

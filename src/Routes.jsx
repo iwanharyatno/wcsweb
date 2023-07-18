@@ -33,11 +33,7 @@ const Routes = [
     },
     {
         path: Path.ForgotPassword,
-        element: (
-            <AuthProtected redirect={Path.Login}>
-                <ForgotPassword />
-            </AuthProtected>
-        )
+        element: <ForgotPassword />
     },
     {
         path: Path.Admin.Index,
