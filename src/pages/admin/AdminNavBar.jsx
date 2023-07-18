@@ -33,8 +33,7 @@ function AdminNavBar() {
                     text: 'Manage Users',
                     href: Path.Admin.Users.Index
                 }
-            ]}
-            authText="Admin" />
+            ]} />
     )
 }
 

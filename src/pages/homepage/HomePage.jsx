@@ -83,8 +83,7 @@ function HomePage() {
                         text: "Upload Media",
                         href: Path.User.Upload
                     }
-                ]}
-                authText="User" />
+                ]} />
             <main className="px-8 max-w-5xl mx-auto">
                 <img src="/banner.png" alt="" className="w-full md:w-auto md:mx-auto my-12" />
                 <div className="md:grid grid-cols-2">
