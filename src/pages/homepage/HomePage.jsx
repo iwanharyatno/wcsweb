@@ -16,11 +16,18 @@ function HomePage() {
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [noMore, setNoMore] = useState(false);
+
     const limit = 10;
 
     const msgBox = useContext(MessageBoxContext);
     const [searchParams] = useSearchParams();
     const mediaType = searchParams.get('type');
+
+    const updatePrevSearch = (value) => {
+        prevSearch = value;
+        return;
+    }
 
     const loadData = async () => {
         setLoading(true);
@@ -29,25 +36,40 @@ function HomePage() {
 
         if (prevSearch && prevSearch.searchQuery.length) {
             prevSearch.abortController.abort();
-            prevSearch = null;
         }
         const result = await Post.main({ offset, limit, type: (mediaType || undefined), keyword: (searchQuery ? searchQuery : undefined)}, abortController);
-
-        prevSearch = { id, abortController, searchQuery };
-        if (!result && prevSearch && prevSearch.searchQuery.length) return;
-        if (handleErrors(msgBox, result)) {
-            console.log(prevSearch);
-            return;
-        }
-
-        if (result) {
-            if (offset !== 0 && result.data) setPosts([...posts, ...result.data]);
-            else setPosts(result.data || []);
-        }
         setLoading(false);
+
+        if (!result && prevSearch && prevSearch.searchQuery.length) return updatePrevSearch();
+        if (handleErrors(msgBox, result)) {
+            return updatePrevSearch({ id, abortController, searchQuery });
+        }
+
+        setNoMore(!result.data);
+
+        if (searchQuery && prevSearch && prevSearch.searchQuery.length != searchQuery.length) {
+            setPosts(result.data);
+            return updatePrevSearch({ id, abortController, searchQuery });
+        }
+
+        if (prevSearch && prevSearch.searchQuery.length > searchQuery.length && !searchQuery) {
+            setPosts(result.data);
+            return updatePrevSearch({ id, abortController, searchQuery });
+        }
+
+        if (!result.data) {
+            return updatePrevSearch({ id, abortController, searchQuery });
+        }
+
+        setPosts([...posts, ...result.data]);
+        updatePrevSearch({ id, abortController, searchQuery });
     }
 
     useEffect(() => {
+        if (prevSearch && prevSearch.searchQuery.length != searchQuery.length && offset != 0) {
+            setOffset(0);
+            return;
+        }
         loadData();
     }, [offset, searchQuery]);
 
@@ -95,7 +117,7 @@ function HomePage() {
                     {posts && posts.length ? posts.map(p => <MediaPreview className="h-72" media={p} key={p.id} />) : <div className="font-bold text-center md:col-span-2 text-sm italic text-gray">No Posts, yet.</div>}
                 </div>
                 <div className="text-center mt-4 mb-8">
-                <Button disabled={loading || !posts || !posts.length} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
+                <Button disabled={loading || !posts || !posts.length || noMore} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
                 </div>
             </main>
         </>
