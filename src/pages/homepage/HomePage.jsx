@@ -92,6 +92,18 @@ function HomePage() {
                             <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
                         </form>
                     </div>
+                    <MediaPreview className="h-72" media={{
+                        title: 'Big buck Bunny sample HLS',
+                        description: 'There\'s not much to see here, this is just some test HLS streams, primarily used by hls.js and hosted with 💖 by Mux.',
+                        media: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+                        type: 'video'
+                    }} />
+                    <MediaPreview className="h-72" media={{
+                        title: 'Tears of Steel, HLS with IMSC Captions',
+                        description: 'There\'s not much to see here, this is just some test HLS streams, primarily used by hls.js and hosted with 💖 by Mux.',
+                        media: 'https://test-streams.mux.dev/tos_ismc/main.m3u8',
+                        type: 'video'
+                    }} />
                     {posts && posts.length ? posts.map(p => <MediaPreview className="h-72" media={p} key={p.id} />) : <div className="font-bold text-center md:col-span-2 text-sm italic text-gray">No Posts, yet.</div>}
                 </div>
                 <div className="text-center mt-4 mb-8">

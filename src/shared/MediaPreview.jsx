@@ -3,7 +3,6 @@ import { truncate } from "./utils";
 import { useEffect, useRef, useState } from "react";
 import LoadingCircle from "./LoadingCircle";
 import Watermark from "./Watermark";
-import Hls from "hls.js";
 
 function MediaPreview({ media, className, nodesc, scaleType }) {
 
@@ -120,16 +119,19 @@ function VideoPreview({ media, className, nodesc }) {
     const videoRef = useRef();
     const hlsRef = useRef();
 
-    useEffect(() => {
+    const prepVideo = async () => {
         if (videoRef.current) {
             setLoading(true);
 
+            const {default: Hls} = await import('hls.js');
             if (Hls.isSupported()) {
                 hlsRef.current = new Hls();
 
                 const hls = hlsRef.current;
                 hls.on(Hls.Events.MANIFEST_LOADED, function() {
                     setLoading(false);
+                    videoRef.current.play();
+                    setPlaying(true);
                 });
                 hls.loadSource(media.media);
                 hls.attachMedia(videoRef.current);
@@ -137,12 +139,14 @@ function VideoPreview({ media, className, nodesc }) {
                 videoRef.current.src = media.media;
             }
         }
-    }, []);
+    };
 
     const startPlaying = () => {
-        if (!loading) {
+        if (hlsRef.current) {
             videoRef.current.play();
             setPlaying(true);
+        } else {
+            prepVideo();
         }
     }
 
