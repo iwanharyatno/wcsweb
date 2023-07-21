@@ -3,12 +3,14 @@ import { dispatchFetchEvent } from "../events/fetchEvents";
 import getAxios from "../network/getAxios";
 
 const User = {
-    all: async (params) => {
+    all: async (params, abortController) => {
         let result = null;
 
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
-            result = await getAxios().get(ApiEndpoint.User.All(params));
+            result = await getAxios().get(ApiEndpoint.User.All(params), {
+                signal: abortController.signal
+            });
             result = result.data;
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);
@@ -23,7 +25,7 @@ const User = {
 
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
-            result = await getAxios().delete(ApiEndpoint.User.Update(id), data);
+            result = await getAxios().put(ApiEndpoint.User.Update(id), data);
             result = result.data;
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);

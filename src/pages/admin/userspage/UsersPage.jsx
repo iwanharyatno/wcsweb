@@ -7,34 +7,72 @@ import TextEditable from "../../../shared/TextEditable";
 import { Link } from "react-router-dom";
 import { Path } from "../../../constants";
 import User from "../../../api/User";
+import { Button } from "../../../shared/Button";
 
 let prevSearch;
 
 function UsersPage() {
     const [searchQuery, setSearchQuery] = useState('');
+    const [offset, setOffset] = useState(0);
+    const [noMore, setNoMore] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [users, setUsers] = useState([]);
     const [user, setUser] = useState(null);
+
+    const limit = 20;
 
     const visibleUsers = users.filter(u => !u.uiDeleted);
 
     const msgBox = useContext(MessageBoxContext);
 
-    useEffect(() => {
-        const loadData = async () => {
-            if (prevSearch && prevSearch.searchQuery.length) {
-                prevSearch.abortController.abort();
-                prevSearch = null;
-            }
+    const updatePrevSearch = (value) => {
+        prevSearch = value;
+        return;
+    }
 
-            const result = await User.all({ searchQuery: (searchQuery || undefined) });
-            const abortController = new AbortController();
-            prevSearch = { searchQuery, abortController };
-            if (handleErrors(msgBox, result)) return;
+    const loadData = async () => {
+        setLoading(true);
+        const abortController = new AbortController();
+        const id = +new Date();
 
+        if (prevSearch && prevSearch.searchQuery.length) {
+            prevSearch.abortController.abort();
+        }
+        const result = await User.all({ offset, limit, keyword: (searchQuery ? searchQuery : undefined)}, abortController);
+        setLoading(false);
+
+        if (!result && prevSearch && prevSearch.searchQuery.length) return updatePrevSearch();
+        if (handleErrors(msgBox, result)) {
+            return updatePrevSearch({ id, abortController, searchQuery });
+        }
+
+        setNoMore(!result.data);
+
+        if (searchQuery && prevSearch && prevSearch.searchQuery.length != searchQuery.length) {
             setUsers(result.data);
-        };
+            return updatePrevSearch({ id, abortController, searchQuery });
+        }
+
+        if (prevSearch && prevSearch.searchQuery.length > searchQuery.length && !searchQuery) {
+            setUsers(result.data);
+            return updatePrevSearch({ id, abortController, searchQuery });
+        }
+
+        if (!result.data) {
+            return updatePrevSearch({ id, abortController, searchQuery });
+        }
+
+        setUsers([...users, ...result.data]);
+        updatePrevSearch({ id, abortController, searchQuery });
+    }
+
+    useEffect(() => {
+        if (prevSearch && prevSearch.searchQuery.length != searchQuery.length && offset != 0) {
+            setOffset(0);
+            return;
+        }
         loadData();
-    }, [searchQuery]);
+    }, [offset, searchQuery]);
 
     const cancelDelete = (target) => {
         setUsers(updateData(users, u => u.id == target.id, { uiDeleted: undefined }));
@@ -48,6 +86,11 @@ function UsersPage() {
             return;
         }
 
+        msgBox.showMessage({
+            type: 'success',
+            message: `User '${target.full_name}' deleted.`
+        });
+
         setUsers(
             removeData(users, u => u.id == target.id)
         );
@@ -58,7 +101,7 @@ function UsersPage() {
         setUsers(updateData(users, u => u.id == user.id, { uiDeleted: true }));
         msgBox.showMessage({
             type: 'warning',
-            message: `Deleting user "${user.fullname}"`,
+            message: `Deleting user "${user.full_name}"`,
             timer: 5,
             action: {
                 text: 'Undo',
@@ -90,6 +133,8 @@ function UsersPage() {
         }
         setUser(u);
     }
+
+    console.log(loading);
 
     return (
         <div className="w-full min-h-screen bg-blue-lighter flex items-center">
@@ -124,6 +169,7 @@ function UsersPage() {
                         </tbody>
                     </table>
                 </div>
+                <Button disabled={loading || !users || !users.length || noMore} onClick={() => setOffset(offset + limit)} className="self-start mt-5">See More</Button>
             </div>
         </div>
     )
@@ -139,7 +185,7 @@ function UserDetail({ user, onClose }) {
                 </button>
             </div>
             <div className="p-6">
-                <h3 className="text-lg font-bold mb-2">{user.fullname}</h3>
+                <h3 className="text-lg font-bold mb-2">{user.full_name}</h3>
                 <p className="flex gap-2 mb-8">
                     <span>{user.email}</span>
                     <span>|</span>
@@ -224,7 +270,7 @@ function UserRow({ user, index, onEdit, onDelete, onShow }) {
         <tr className={['z-10 hover:bg-gray-light relative', (loading) ? 'after:absolute after:bg-black/40 after:w-full after:h-full after:top-0 after:left-0' : ''].join(' ')}>
             <td className="text-center py-2">{index}</td>
             <td>
-                <TextEditable type="text" value={data.fullname || ''} onChange={(value) => updateData('fullname', value)} />
+                <TextEditable type="text" value={data.full_name || ''} onChange={(value) => updateData('full_name', value)} />
             </td>
             <td>
                 <TextEditable type="email" value={data.email || ''} onChange={(value) => updateData('email', value)} />
@@ -242,10 +288,10 @@ function UserRow({ user, index, onEdit, onDelete, onShow }) {
                 </TextEditable>
             </td>
             <td className="flex items-center justify-start gap-4 col-start-9 md:col-start-12 col-span-3 md:col-span-1 md:row-span-2">
-                <button onClick={() => onDelete(user)} className="hover:bg-red-medium text-red-medium hover:text-white p-2 rounded-md" title={'Delete ' + user.fullname}>
+                <button onClick={() => onDelete(latestData)} className="hover:bg-red-medium text-red-medium hover:text-white p-2 rounded-md" title={'Delete ' + latestData.full_name}>
                     <FaTrash />
                 </button>
-                <button onClick={() => onShow(user)} className="hover:bg-blue-medium text-blue-medium hover:text-white p-2 rounded-md" title="Show detail">
+                <button onClick={() => onShow(latestData)} className="hover:bg-blue-medium text-blue-medium hover:text-white p-2 rounded-md" title="Show detail">
                     <FaList />
                 </button>
             </td>

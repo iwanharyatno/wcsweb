@@ -54,8 +54,8 @@ const ApiEndpoint = {
     User: {
         All: (params) => createApiPath('/users', params),
         Detail: (id) => createApiPath('/users/' + id),
-        Update: (id) => createApiPath('/users/' + id),
-        Delete: (id) => createApiPath('/users/' + id),
+        Update: (id) => createApiPath('/users/' + id + '/update'),
+        Delete: (id) => createApiPath('/users/' + id + '/delete'),
     }
 }
 
