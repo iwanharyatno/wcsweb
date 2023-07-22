@@ -114,7 +114,9 @@ function HomePage() {
                             <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
                         </form>
                     </div>
-                    {posts && posts.length ? posts.map(p => <MediaPreview className="h-72" media={p} key={p.id} />) : <div className="font-bold text-center md:col-span-2 text-sm italic text-gray">No Posts, yet.</div>}
+                {posts && posts.length ? posts.map(e => <MediaPreview className="h-72" media={e} key={e.id} />) : undefined}
+                {loading && <div className="col-span-2 font-bold text-center text-sm italic text-gray">Loading data...</div>}
+                {posts == null && <div className="col-span-2 font-bold text-center text-sm italic text-gray">No Posts, yet.</div>}
                 </div>
                 <div className="text-center mt-4 mb-8">
                 <Button disabled={loading || !posts || !posts.length || noMore} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>

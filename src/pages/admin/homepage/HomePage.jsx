@@ -60,6 +60,7 @@ function HomePage() {
         }
 
         if (!result.data) {
+            setPosts(null);
             return updatePrevSearch({ id, abortController, searchQuery });
         }
 
@@ -90,7 +91,9 @@ function HomePage() {
                         <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
                     </form>
                 </div>
-                {posts && posts.length ? posts.map(e => <MediaItem media={e} key={e.id} />) : <div className="col-span-2 font-bold text-center text-sm italic text-gray">No Posts, yet.</div>}
+                {posts && posts.length ? posts.map(e => <MediaItem media={e} key={e.id} />) : undefined}
+                {loading && <div className="col-span-2 font-bold text-center text-sm italic text-gray">Loading data...</div>}
+                {posts == null && <div className="col-span-2 font-bold text-center text-sm italic text-gray">No Posts, yet.</div>}
             </div>
             <div className="text-center mt-4 mb-8">
                 <Button disabled={loading || !posts || !posts.length || noMore} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>

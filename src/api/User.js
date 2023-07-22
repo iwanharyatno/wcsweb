@@ -50,12 +50,12 @@ const User = {
 
         return result;
     },
-    detail: async (id) => {
+    history: async (id) => {
         let result = null;
 
         try {
             dispatchFetchEvent(FETCH_START_EVENT);
-            result = await getAxios().get(ApiEndpoint.User.Detail(id));
+            result = await getAxios().get(ApiEndpoint.User.History(id));
             result = result.data;
         } catch(e) {
             dispatchFetchEvent(FETCH_FAILED_EVENT);

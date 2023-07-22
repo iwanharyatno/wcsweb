@@ -33,9 +33,6 @@ function updateData(data, predicate, newData) {
         ...target,
         ...newData
     };
-    
-    console.log(data);
-    console.log(updated);
 
     return updated;
 }

@@ -4,7 +4,7 @@ import { FaList, FaTimes, FaTrash } from "react-icons/fa";
 import MessageBoxContext from "../../../shared/MessageBoxContext";
 import { handleErrors, objectEqual, removeData, updateData } from "../../../shared/utils";
 import TextEditable from "../../../shared/TextEditable";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Path } from "../../../constants";
 import User from "../../../api/User";
 import { Button } from "../../../shared/Button";
@@ -21,7 +21,7 @@ function UsersPage() {
 
     const limit = 20;
 
-    const visibleUsers = users.filter(u => !u.uiDeleted);
+    const visibleUsers = users ? users.filter(u => !u.uiDeleted) : null;
 
     const msgBox = useContext(MessageBoxContext);
 
@@ -59,6 +59,7 @@ function UsersPage() {
         }
 
         if (!result.data) {
+            setUsers(null);
             return updatePrevSearch({ id, abortController, searchQuery });
         }
 
@@ -134,8 +135,6 @@ function UsersPage() {
         setUser(u);
     }
 
-    console.log(loading);
-
     return (
         <div className="w-full min-h-screen bg-blue-lighter flex items-center">
             {user && <UserDetail user={user} onClose={() => setUser(null)} />}
@@ -158,10 +157,18 @@ function UsersPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-light">
-                            {visibleUsers.length ? visibleUsers.map((u, i) => <UserRow user={u} key={u.id} index={i+1} onEdit={onEdit} onDelete={(user) => prepDeleteUser(user)} onShow={(user) => showUser(user)} />) : (
+                            {visibleUsers && (visibleUsers.length ? visibleUsers.map((u, i) => <UserRow user={u} key={u.id} index={i+1} onEdit={onEdit} onDelete={(user) => prepDeleteUser(user)} onShow={(user) => showUser(user)} />) : undefined)}
+                            {loading && (
                                 <tr>
                                     <td colSpan={6} className="py-3 px-1 text-center">
-                                        <span className="font-bold italic text-gray">No users, yet. </span>
+                                        <span className="font-bold text-gray">Loading...</span>
+                                    </td>
+                                </tr>
+                            )}
+                            {(visibleUsers == null || users == null) && (
+                                <tr>
+                                    <td colSpan={6} className="py-3 px-1 text-center">
+                                        <span className="font-bold text-gray">No users, yet. </span>
                                         <Link className="text-blue hover:underline" to={Path.Admin.NewUser}>Register one!</Link>
                                     </td>
                                 </tr>
@@ -176,15 +183,33 @@ function UsersPage() {
 }
 
 function UserDetail({ user, onClose }) {
+    const [mediaHistory, setMediaHistory] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const msgBox = useContext(MessageBoxContext);
+
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+            const result = await User.history(user.id);
+            setLoading(false);
+
+            if (handleErrors(msgBox, result)) return;
+
+            setMediaHistory(result.data);
+        };
+        loadData();
+    }, []);
+
     return (
-        <div className="z-50 fixed w-full h-full lg:h-screen lg:block lg:static lg:w-auto lg:grow grow bg-blue-medium text-white">
+        <div className="z-20 fixed w-full h-full lg:h-screen lg:block lg:static lg:w-auto lg:grow grow bg-blue-medium text-white">
             <div className="flex items-stretch p-0 border-b border-b-blue-light">
                 <h2 className="text-xl grow px-6 py-4">User Detail</h2>
                 <button className="text-xl px-6 py-4" onClick={onClose}>
                     <FaTimes />
                 </button>
             </div>
-            <div className="p-6">
+            <div className="p-6 h-[85vh] overflow-auto">
                 <h3 className="text-lg font-bold mb-2">{user.full_name}</h3>
                 <p className="flex gap-2 mb-8">
                     <span>{user.email}</span>
@@ -192,44 +217,19 @@ function UserDetail({ user, onClose }) {
                     <span>{user.phone_number}</span>
                 </p>
                 <h3 className="text-lg mb-2 font-bold">Upload History</h3>
-                <UploadHistoryCard media={{
-                    "id": 1,
-                    "title": "Raja Ampat",
-                    "subject": "Pulau",
-                    "creator_name": "Sang Fotografer",
-                    "description": "-",
-                    "media": "https://api.wcs.bakaranproject.com/asset/raja-ampat.jpg",
-                    "created_at": "2023-07-12T14:05:44+07:00",
-                    "updated_at": "2023-07-13T14:05:46+07:00"
-                }} />
-                <UploadHistoryCard media={{
-                    "id": 1,
-                    "title": "Raja Ampat",
-                    "subject": "Pulau",
-                    "creator_name": "Sang Fotografer",
-                    "description": "-",
-                    "media": "https://api.wcs.bakaranproject.com/asset/raja-ampat.jpg",
-                    "created_at": "2023-07-12T14:05:44+07:00",
-                    "updated_at": "2023-07-13T14:05:46+07:00"
-                }} />
-                <UploadHistoryCard media={{
-                    "id": 1,
-                    "title": "Raja Ampat",
-                    "subject": "Pulau",
-                    "creator_name": "Sang Fotografer",
-                    "description": "-",
-                    "media": "https://api.wcs.bakaranproject.com/asset/raja-ampat.jpg",
-                    "created_at": "2023-07-12T14:05:44+07:00",
-                    "updated_at": "2023-07-13T14:05:46+07:00"
-                }} />
+                {mediaHistory && (mediaHistory.length ? mediaHistory.map(m => <UploadHistoryCard media={m} key={m.id} />) : undefined)}
+                {loading ? <p>Loading information...</p> : undefined}
+                {mediaHistory == null ? <p>No data.</p> : undefined}
             </div>
         </div>
     )
 }
 
 function UploadHistoryCard({ media }) {
+    const navigate = useNavigate();
+
     return (
-        <article className="border border-blue-light rounded-md p-3 my-2">
+        <article className="border border-blue-light rounded-md p-3 my-2 cursor-pointer hover:bg-blue-light/20" onClick={() => navigate(Path.Admin.MediaDetail(media.id))}>
             <h2 className="text-md hover:underline"><Link to={Path.Admin.MediaDetail(media.id)}>{media.title}</Link></h2>
             <p className="flex gap-2 text-sm">
                 <span>{media.creator_name}</span>
@@ -267,19 +267,19 @@ function UserRow({ user, index, onEdit, onDelete, onShow }) {
     }
 
     return (
-        <tr className={['z-10 hover:bg-gray-light relative', (loading) ? 'after:absolute after:bg-black/40 after:w-full after:h-full after:top-0 after:left-0' : ''].join(' ')}>
+        <tr className={['z-10 hover:bg-gray-light/40 relative', (loading) ? 'after:absolute after:bg-black/20 after:w-full after:h-full after:top-0 after:left-0' : ''].join(' ')}>
             <td className="text-center py-2">{index}</td>
             <td>
-                <TextEditable type="text" value={data.full_name || ''} onChange={(value) => updateData('full_name', value)} />
+                <TextEditable type="text" value={data.full_name || ''} onChange={(value) => updateData('full_name', value)} label={`Full name of "${data.full_name}"`} />
             </td>
             <td>
-                <TextEditable type="email" value={data.email || ''} onChange={(value) => updateData('email', value)} />
+                <TextEditable type="email" value={data.email || ''} onChange={(value) => updateData('email', value)} label={`Email of "${data.full_name}"`} />
             </td>
             <td>
-                <TextEditable type="number" value={data.phone_number || ''} onChange={(value) => updateData('phone_number', value)} />
+                <TextEditable type="number" value={data.phone_number || ''} onChange={(value) => updateData('phone_number', value)} label={`Phone number of "${data.full_name}"`} />
             </td>
             <td>
-                <TextEditable type="select" value={data.work_type || ''} onChange={(value) => updateData('work_type', value)}>
+                <TextEditable type="select" value={data.work_type || ''} onChange={(value) => updateData('work_type', value)} label={`Work type of "${data.full_name}"`}>
                     <option value="">-- Select WorkType --</option>
                     <option value="Student">Student</option>
                     <option value="Employee">Employee</option>
@@ -288,7 +288,7 @@ function UserRow({ user, index, onEdit, onDelete, onShow }) {
                 </TextEditable>
             </td>
             <td className="flex items-center justify-start gap-4 col-start-9 md:col-start-12 col-span-3 md:col-span-1 md:row-span-2">
-                <button onClick={() => onDelete(latestData)} className="hover:bg-red-medium text-red-medium hover:text-white p-2 rounded-md" title={'Delete ' + latestData.full_name}>
+                <button onClick={() => onDelete(latestData)} className="hover:bg-red-medium text-red-medium hover:text-white p-2 rounded-md" title={'Delete "' + data.full_name + '"'}>
                     <FaTrash />
                 </button>
                 <button onClick={() => onShow(latestData)} className="hover:bg-blue-medium text-blue-medium hover:text-white p-2 rounded-md" title="Show detail">
