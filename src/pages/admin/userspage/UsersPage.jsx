@@ -59,7 +59,7 @@ function UsersPage() {
         }
 
         if (!result.data) {
-            setUsers(null);
+            if (offset == 0) setUsers(null);
             return updatePrevSearch({ id, abortController, searchQuery });
         }
 
@@ -190,6 +190,7 @@ function UserDetail({ user, onClose }) {
 
     useEffect(() => {
         const loadData = async () => {
+            setMediaHistory([]);
             setLoading(true);
             const result = await User.history(user.id);
             setLoading(false);
@@ -202,14 +203,14 @@ function UserDetail({ user, onClose }) {
     }, [user]);
 
     return (
-        <div className="z-20 fixed w-full h-full lg:h-screen lg:block lg:static lg:w-auto lg:grow grow bg-blue-medium text-white">
+        <div className="z-20 fixed flex flex-col w-full h-full lg:h-screen lg:flex lg:static lg:w-auto lg:grow grow bg-blue-medium text-white">
             <div className="flex items-stretch p-0 border-b border-b-blue-light">
                 <h2 className="text-xl grow px-6 py-4">User Detail</h2>
                 <button className="text-xl px-6 py-4" onClick={onClose}>
                     <FaTimes />
                 </button>
             </div>
-            <div className="p-6 h-[85vh] overflow-auto">
+            <div className="p-6 grow overflow-auto">
                 <h3 className="text-lg font-bold mb-2">{user.full_name}</h3>
                 <p className="flex gap-2 mb-8">
                     <span>{user.email}</span>

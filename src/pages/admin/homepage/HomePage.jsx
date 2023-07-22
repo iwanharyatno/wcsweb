@@ -60,7 +60,7 @@ function HomePage() {
         }
 
         if (!result.data) {
-            setPosts(null);
+            if (offset == 0) setPosts(null);
             return updatePrevSearch({ id, abortController, searchQuery });
         }
 
