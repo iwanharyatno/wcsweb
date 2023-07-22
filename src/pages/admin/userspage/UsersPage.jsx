@@ -199,7 +199,7 @@ function UserDetail({ user, onClose }) {
             setMediaHistory(result.data);
         };
         loadData();
-    }, []);
+    }, [user]);
 
     return (
         <div className="z-20 fixed w-full h-full lg:h-screen lg:block lg:static lg:w-auto lg:grow grow bg-blue-medium text-white">
