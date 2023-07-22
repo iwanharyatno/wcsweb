@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { FormInput } from "../../../shared/FormInput";
 import { FaList, FaTimes, FaTrash } from "react-icons/fa";
 import MessageBoxContext from "../../../shared/MessageBoxContext";
-import { handleErrors, objectEqual, removeData, updateData } from "../../../shared/utils";
+import { handleErrors, objectEqual, removeData, truncate, updateData } from "../../../shared/utils";
 import TextEditable from "../../../shared/TextEditable";
 import { Link, useNavigate } from "react-router-dom";
 import { Path } from "../../../constants";
@@ -230,7 +230,7 @@ function UploadHistoryCard({ media }) {
 
     return (
         <article className="border border-blue-light rounded-md p-3 my-2 cursor-pointer hover:bg-blue-light/20" onClick={() => navigate(Path.Admin.MediaDetail(media.id))}>
-            <h2 className="text-md hover:underline"><Link to={Path.Admin.MediaDetail(media.id)}>{media.title}</Link></h2>
+            <h2 className="text-md hover:underline"><Link to={Path.Admin.MediaDetail(media.id)} title={media.title}>{truncate(media.title, 30)}</Link></h2>
             <p className="flex gap-2 text-sm">
                 <span>{media.creator_name}</span>
                 <span>|</span>
