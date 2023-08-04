@@ -31,7 +31,7 @@ function HomePage() {
         return;
     }
 
-    const loadData = async () => {
+    const loadData = async (reset) => {
         setLoading(true);
         const abortController = new AbortController();
         const id = +new Date();
@@ -39,7 +39,7 @@ function HomePage() {
         if (prevSearch && prevSearch.searchQuery.length) {
             prevSearch.abortController.abort();
         }
-        const result = await Post.main({ offset, limit, type: (mediaType || undefined), keyword: (searchQuery ? searchQuery : undefined)}, abortController);
+        const result = await Post.main({ offset: reset ? 0 : reset, limit, type: (mediaType || undefined), keyword: (searchQuery ? searchQuery : undefined)}, abortController);
         setLoading(false);
 
         if (!result && prevSearch && prevSearch.searchQuery.length) return updatePrevSearch();
@@ -64,7 +64,12 @@ function HomePage() {
             return updatePrevSearch({ id, abortController, searchQuery });
         }
 
-        setPosts([...posts, ...result.data]);
+        if (reset) {
+            setPosts(result.data);
+            return updatePrevSearch({ id, abortController, searchQuery });
+        }
+
+        setPosts([...(posts || []), ...result.data]);
         updatePrevSearch({ id, abortController, searchQuery });
     }
 
@@ -73,12 +78,14 @@ function HomePage() {
             setOffset(0);
             return;
         }
-        loadData();
+        loadData(prevSearch == null);
     }, [offset, searchQuery]);
 
     useEffect(() => {
+        prevSearch = null;
         setPosts([]);
-        loadData();
+        if (offset == 0) loadData(true);
+        setOffset(0);
     }, [searchParams]);
 
     return (
