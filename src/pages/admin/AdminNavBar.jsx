@@ -1,7 +1,7 @@
 import { Path } from "../../constants";
 import NavBar from "../partials/NavBar";
 
-function AdminNavBar() {
+function AdminNavBar({ className, backTo }) {
     return (
         <NavBar
             items={[
@@ -33,7 +33,7 @@ function AdminNavBar() {
                     text: 'Manage Users',
                     href: Path.Admin.Users.Index
                 }
-            ]} />
+            ]} className={className} backTo={backTo} />
     )
 }
 

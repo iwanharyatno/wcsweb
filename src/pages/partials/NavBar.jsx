@@ -1,13 +1,14 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import { LinkButton } from "../../shared/Button";
 import ProfilePhoto from "../../shared/ProfilePhoto";
 import { Path } from "../../Routes";
 import { AppConfig } from "../../constants";
+import { FaArrowLeft } from "react-icons/fa";
 
 const cookies = new Cookies();
 
-function NavBar({ actions, items }) {
+function NavBar({ actions, items, className, backTo }) {
     const navigate = useNavigate();
     const user = cookies.get(AppConfig.USER_COOKIE_KEY) ? cookies.get(AppConfig.USER_COOKIE_KEY)['data'] : null;
 
@@ -17,8 +18,8 @@ function NavBar({ actions, items }) {
     }
 
     return (
-        <nav className="flex items-center p-3 bg-gray-light justify-between">
-            <img src="/logo.svg" alt="" />
+        <nav className={[className, "flex items-center p-3 justify-between"].join(' ')}>
+            {backTo ? <Link to={backTo} title="Back" className="text-xl"><FaArrowLeft /></Link> : <img src="/logo.svg" alt="" />}
             <ul className="flex gap-2">
                 {items.map(m => <li className="text-blue-dark font-bold " key={m.href}><NavLink to={m.href}>{m.text}</NavLink></li>)}
             </ul>

@@ -8,8 +8,8 @@ import { Path } from "../../../Routes";
 import MessageBoxContext from "../../../shared/MessageBoxContext";
 import Post from "../../../api/Post";
 import AdminNavBar from "../AdminNavBar";
-import Banner from "../../../api/Banner";
 import MediaPreview from "../../../shared/MediaPreview";
+import Watermark from "../../../shared/Watermark";
 
 let prevSearch = null;
 
@@ -21,7 +21,7 @@ function HomePage() {
     const [searchParams] = useSearchParams();
     const [noMore, setNoMore] = useState(false);
 
-    const limit = 10;
+    const limit = 12;
     const mediaType = searchParams.get('type');
 
     const msgBox = useContext(MessageBoxContext);
@@ -83,17 +83,17 @@ function HomePage() {
 
     return (
         <div>
-            <AdminNavBar />
-            <MediaHero />
-            <div className="grid md:grid-cols-2 max-w-6xl mx-auto p-8 gap-8">
-                <div className="md:col-span-2">
+            <AdminNavBar className="bg-gray-light" />
+            <MediaHero banners={posts.slice(0, 10)} />
+            <div className="grid xl:grid-cols-3 max-w-[112rem] mx-auto p-8 gap-8">
+                <div className="xl:col-span-3">
                     <form onSubmit={(e) => e.preventDefault()} className="flex justify-end gap-2">
                         <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
                     </form>
                 </div>
                 {posts && posts.length ? posts.map(e => <MediaItem media={e} key={e.id} />) : undefined}
-                {loading && <div className="col-span-2 font-bold text-center text-sm italic text-gray">Loading data...</div>}
-                {posts == null && <div className="col-span-2 font-bold text-center text-sm italic text-gray">No Posts, yet.</div>}
+                {loading && <div className="col-span-3 font-bold text-center text-sm italic text-gray">Loading data...</div>}
+                {posts == null && <div className="col-span-3 font-bold text-center text-sm italic text-gray">No Posts, yet.</div>}
             </div>
             <div className="text-center mt-4 mb-8">
                 <Button disabled={loading || !posts || !posts.length || noMore} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
@@ -102,24 +102,8 @@ function HomePage() {
     );
 }
 
-function MediaHero() {
-    const [banners, setBanners] = useState([]);
-    const [offset] = useState(0);
+function MediaHero({ banners }) {
     const [currentIndex, setCurrentIndex] = useState(0);
-
-    const msgBox = useContext(MessageBoxContext);
-    const limit = 10;
-
-    useEffect(() => {
-        const loadData = async () => {
-            const result = await Banner.all({ offset, limit });
-            
-            if (handleErrors(msgBox, result)) return;
-
-            if (result) setBanners(result.data)
-        };
-        loadData();
-    }, [offset]);
 
     const previousBanner = () => {
         if (currentIndex === 0) {
@@ -141,6 +125,7 @@ function MediaHero() {
         <div className={'relative min-h-screen md:min-h-[45vh] overflow-hidden'}>
             {banners.map(b => (
                 <div key={b.id} className={['absolute top-0 left-0 bg-cover bg-center w-full h-full', (banners[currentIndex].id === b.id ? 'animate-slide-in' : 'hidden')].join(' ')} style={{ backgroundImage: `url("${b.media}")`, animationFillMode: 'forwards' }}>
+                    <Watermark />
                 </div>
             ))}
             <div className="absolute top-0 left-0 w-full h-full text-white flex justify-between px-8 z-10 items-center gap-2">

@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Path } from "../../../constants";
 import User from "../../../api/User";
 import { Button } from "../../../shared/Button";
+import AdminNavBar from "../AdminNavBar";
 
 let prevSearch;
 
@@ -136,9 +137,10 @@ function UsersPage() {
     }
 
     return (
-        <div className="w-full min-h-screen bg-blue-lighter flex items-center">
+        <div className="w-full min-h-screen flex items-center">
             {user && <UserDetail user={user} onClose={() => setUser(null)} />}
-            <div className="bg-white min-h-screen w-full lg:w-[80vw] mx-auto p-8 flex flex-col">
+            <div className="bg-white min-h-screen w-full lg:w-[80vw] mx-auto px-8 flex flex-col">
+                <AdminNavBar backTo={Path.Admin.Index} />
                 <h1 className="text-4xl text-blue-light font-bold pt-4 mb-12">Manage Users</h1>
                 <div className="flex flex-row items-center mb-5">
                     <h2 className="text-lg mr-4 md:mr-12">All Users</h2>

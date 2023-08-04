@@ -18,7 +18,7 @@ function HomePage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [noMore, setNoMore] = useState(false);
 
-    const limit = 10;
+    const limit = 12;
 
     const msgBox = useContext(MessageBoxContext);
     const [searchParams] = useSearchParams();
@@ -82,6 +82,7 @@ function HomePage() {
     return (
         <>
             <NavBar
+                className="bg-gray-light"
                 items={[
                     {
                         text: 'Home',
@@ -107,20 +108,20 @@ function HomePage() {
                         href: Path.User.Upload
                     }
                 ]} />
-            <main className="px-8 max-w-5xl mx-auto">
+            <main className="px-8 max-w-[96rem] mx-auto p-8 gap-8">
                 <img src="/banner.png" alt="" className="w-full md:w-auto md:mx-auto my-12" />
-                <div className="md:grid grid-cols-2">
-                    <div className="md:col-span-2 mb-4">
+                <div className="grid xl:grid-cols-3">
+                    <div className="xl:col-span-3">
                         <form className="flex justify-end gap-2" onSubmit={(e) => e.preventDefault()}>
                             <FormInput value={searchQuery} className="w-full md:w-auto" onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search here.." />
                         </form>
                     </div>
                 {posts && posts.length ? posts.map(e => <MediaPreview className="h-72" media={e} key={e.id} />) : undefined}
-                {loading && <div className="col-span-2 font-bold text-center text-sm italic text-gray">Loading data...</div>}
-                {posts == null && <div className="col-span-2 font-bold text-center text-sm italic text-gray">No Posts, yet.</div>}
+                {loading && <div className="col-span-3 font-bold text-center text-sm italic text-gray">Loading data...</div>}
+                {posts == null && <div className="col-span-3 font-bold text-center text-sm italic text-gray">No Posts, yet.</div>}
                 </div>
                 <div className="text-center mt-4 mb-8">
-                <Button disabled={loading || !posts || !posts.length || noMore} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
+                    <Button disabled={loading || !posts || !posts.length || noMore} variant="pill" className="inline-block min-w-[16rem]" onClick={() => setOffset(offset + limit)}>See More</Button>
                 </div>
             </main>
         </>
